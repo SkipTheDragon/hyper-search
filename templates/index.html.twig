@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <script>
+        window.APP_SETTINGS = {
+            API_URL: '{{ app_host }}',
+        }
+    </script>
+
+    <div {{ react_component('SearchController', {}) }}>
+        Loading... <i class="fas fa-cog fa-spin fa-3x"></i>
+    </div>
+{% endblock %}

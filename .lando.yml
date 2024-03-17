@@ -1,0 +1,59 @@
+# https://docs.lando.dev/plugins/symfony/config.html
+
+name: hyper-search
+recipe: symfony
+config:
+  webroot: ./public
+  php: '8.2'
+  via: nginx
+  cache: memcached
+services:
+  appserver:
+    run:
+      - composer install
+      - bin/console manticore:migrate
+      - bin/console manticore:seed
+    overrides:
+      ports:
+        - 1241
+    scanner:
+      okCodes:
+        - 426
+  node:
+    type: node:18
+    run:
+      - yarn
+      - yarn build
+  manticore:
+    api: 3
+    type: lando
+    services:
+      image: manticoresearch/manticore:6.2.12
+      command: /usr/local/bin/docker-entrypoint.sh  su - manticore -c '/usr/bin/searchd -c /etc/manticoresearch/manticore.conf --nodetach'
+      ports:
+        - 9306:9306
+        - 9308:9308
+      volumes:
+        - manticore_volume:/var/lib/manticore
+      ulimits:
+        nproc: 65535
+        nofile:
+          soft: 65535
+          hard: 65535
+        memlock:
+          soft: -1
+          hard: -1
+    volumes:
+      manticore_volume: {}
+tooling:
+  node:
+    service: node
+  npm:
+    service: node
+  yarn:
+    service: node
+  pnpm:
+    service: node
+proxy:
+  appserver:
+    - ws.lndo.site:1241

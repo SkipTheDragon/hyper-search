@@ -1,0 +1,45 @@
+{
+    "devDependencies": {
+        "@babel/core": "^7.17.0",
+        "@babel/preset-env": "^7.16.0",
+        "@babel/preset-react": "^7.22.5",
+        "@hotwired/stimulus": "^3.0.0",
+        "@symfony/stimulus-bridge": "^3.2.0",
+        "@symfony/ux-react": "file:vendor/symfony/ux-react/assets",
+        "@symfony/ux-translator": "file:vendor/symfony/ux-translator/assets",
+        "@symfony/webpack-encore": "^4.0.0",
+        "@types/jest": "^27.5.2",
+        "core-js": "^3.23.0",
+        "file-loader": "^6.2.0",
+        "fork-ts-checker-webpack-plugin": "^7.3.0",
+        "intl-messageformat": "^10.2.5",
+        "react": "^18.0",
+        "react-dom": "^18.0",
+        "regenerator-runtime": "^0.13.9",
+        "ts-loader": "^9.4.3",
+        "typescript": "^5.3.3",
+        "webpack": "^5.74.0",
+        "webpack-cli": "^4.10.0",
+        "webpack-notifier": "^1.15.0"
+    },
+    "license": "UNLICENSED",
+    "private": true,
+    "scripts": {
+        "dev-server": "encore dev-server",
+        "dev": "encore dev",
+        "watch": "encore dev --watch",
+        "build": "encore production --progress"
+    },
+    "dependencies": {
+        "@chakra-ui/icons": "^2.0.19",
+        "@chakra-ui/react": "^2.7.1",
+        "@emotion/react": "^11.11.1",
+        "@emotion/styled": "^11.11.0",
+        "@testing-library/dom": "^9.3.1",
+        "@types/react": "^18.2.13",
+        "@types/react-dom": "^18.2.6",
+        "framer-motion": "^10.12.16",
+        "react-icons": "^4.10.1",
+        "use-debounce": "^10.0.0"
+    }
+}
