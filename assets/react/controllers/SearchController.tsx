@@ -48,6 +48,19 @@ export default function CallToActionWithAnnotation() {
     const canvasRef = useRef(null)
     const reducedMotion = usePrefersReducedMotion();
 
+    const [socket, setSocket] = React.useState<WebSocket|null>(null);
+
+    useEffect(() => {
+        // Connect to the WebSocket server
+        const newSocket =  new WebSocket("ws://ws.lndo.site");// TODO: CHANGE WITH HOST
+
+        setSocket(newSocket);
+
+        return () => {
+            newSocket.close();
+        };
+    }, []);
+
     useEffect(() => {
         document.body.style.transition = 'background-color 0.2s ease-in-out';
 
@@ -67,25 +80,23 @@ export default function CallToActionWithAnnotation() {
     }, [value, isWarpStarted, isSearchFocused]);
 
     useEffect(() => {
-        const socket = new WebSocket("ws://ws.lndo.site"); // TODO: CHANGE WITH HOST
-
-        socket.addEventListener("open", function() {
-            console.log("CONNECTED");
-        });
-    }, []);
+        if (socket) {
+            // Listen for messages from the WebSocket server
+            socket.onmessage = (event) => {
+                const response = JSON.parse(event.data);
+                if (response.status === "error") return;
+                setData(response.data);
+            };
+        }
+    }, [socket]);
 
     useEffect(() => {
         if (value.length < 1) return;
-        fetch(`http://hyper-search.lndo.site//search/${value}`, {  // TODO: CHANGE WITH HOST
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        }).then(r => r.json()).then((data) => {
-            setData(data)
-        });
-    }, [value]);
+
+        if (socket) {
+            socket.send(value);
+        }
+    }, [value,socket]);
 
     return (
         <>

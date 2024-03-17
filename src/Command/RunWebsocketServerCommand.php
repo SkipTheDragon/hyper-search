@@ -13,6 +13,7 @@ use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
 use App\Websocket\MessageHandler;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 #[AsCommand(
     name: 'run:websocket-server',
@@ -20,7 +21,9 @@ use App\Websocket\MessageHandler;
 )]
 class RunWebsocketServerCommand extends Command
 {
-    public function __construct()
+    public function __construct(
+        protected ParameterBagInterface $parameterBag
+    )
     {
         parent::__construct();
     }
@@ -32,7 +35,9 @@ class RunWebsocketServerCommand extends Command
         $server = IoServer::factory(
             new HttpServer(
                 new WsServer(
-                    new MessageHandler()
+                    new MessageHandler(
+                        $this->parameterBag
+                    )
                 )
             ),
             $port
