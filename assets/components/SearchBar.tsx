@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import {SearchIcon} from "@chakra-ui/icons";
 import React, {MutableRefObject, useCallback, useEffect, useMemo, useRef} from "react";
-import {AnimationState, ExtraData} from "../controllers/SearchController";
+import {AnimationState, ExtraData} from "../pages/search";
 
 export interface SearchBarProps {
     animationState: AnimationState;

@@ -8,7 +8,10 @@
         "@symfony/ux-react": "file:vendor/symfony/ux-react/assets",
         "@symfony/ux-translator": "file:vendor/symfony/ux-translator/assets",
         "@symfony/webpack-encore": "^4.0.0",
+        "@testing-library/dom": "^9.3.1",
         "@types/jest": "^27.5.2",
+        "@types/react": "^18.2.13",
+        "@types/react-dom": "^18.2.6",
         "core-js": "^3.23.0",
         "file-loader": "^6.2.0",
         "fork-ts-checker-webpack-plugin": "^7.3.0",
@@ -33,13 +36,12 @@
     "dependencies": {
         "@chakra-ui/icons": "^2.0.19",
         "@chakra-ui/react": "^2.7.1",
+        "@chakra-ui/system": "^2.6.2",
         "@emotion/react": "^11.11.1",
         "@emotion/styled": "^11.11.0",
-        "@testing-library/dom": "^9.3.1",
-        "@types/react": "^18.2.13",
-        "@types/react-dom": "^18.2.6",
         "framer-motion": "^10.12.16",
         "react-icons": "^4.10.1",
-        "use-debounce": "^10.0.0"
+        "use-debounce": "^10.0.0",
+        "zustand": "^4.5.2"
     }
 }

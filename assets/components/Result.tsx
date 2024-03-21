@@ -13,7 +13,7 @@ import {SearchIcon} from "@chakra-ui/icons";
 import NotFound from "./NotFound";
 import Bar from "./Bar";
 import ResultItem from "./ResultItem";
-import {AnimationState, ExtraData, SearchState} from "../controllers/SearchController";
+import {AnimationState, ExtraData, SearchState} from "../pages/search";
 
 export interface SearchResultProps {
     _id: string;

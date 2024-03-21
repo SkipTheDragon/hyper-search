@@ -1,6 +1,6 @@
 import {Heading, Text, useColorModeValue} from "@chakra-ui/react";
 import React from "react";
-import {AnimationState, ExtraData, SearchState} from "../controllers/SearchController";
+import {AnimationState, ExtraData, SearchState} from "../pages/search";
 import result from "./Result";
 
 export interface HeaderProps {
