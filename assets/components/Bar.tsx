@@ -26,9 +26,9 @@ export default function Bar(props: any) {
             <Flex
                 alignItems={'center'}
             >
-                <Kbd mr={2}>TAB</Kbd> <Text as={'span'}>to navigate</Text>
-                <Kbd ml={4} mr={2}>ENTER</Kbd> <Text as={'span'}>to select</Text>
-                <Kbd ml={4} mr={2}>ESC</Kbd> <Text as={'span'}>to close</Text>
+                <Kbd mr={2}>TAB</Kbd> <span>to navigate</span>
+                <Kbd ml={4} mr={2}>ENTER</Kbd> <span>to select</span>
+                <Kbd ml={4} mr={2}>ESC</Kbd> <span>to close</span>
             </Flex>
 
             <Flex

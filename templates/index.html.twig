@@ -14,7 +14,7 @@
         window.config = {{ config|json_encode|raw }}
     </script>
 
-    <div {{ react_component('SearchController', {}) }}>
+    <div {{ react_component('search', {}) }}>
         Loading... <i class="fas fa-cog fa-spin fa-3x"></i>
     </div>
 {% endblock %}

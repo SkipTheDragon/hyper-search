@@ -1,7 +1,7 @@
 import {Heading, Text, useColorModeValue} from "@chakra-ui/react";
 import React from "react";
 import {AnimationState, ExtraData, SearchState} from "../pages/search";
-import result from "./Result";
+import {chakra} from "@chakra-ui/react";
 
 export interface HeaderProps {
     searchState: SearchState;
@@ -35,9 +35,9 @@ const Header: React.FC<HeaderProps> = (
                 animationState === AnimationState.Running ?
                     <>
                         Hyper Searching Initiated... <br/>
-                        <Text as={'span'} color={'brand.400'}>
+                        <chakra.span color={'brand.400'}>
                             Searching the cosmos for you 🚀.
-                        </Text>
+                        </chakra.span>
                     </>
                     :
                     searchState === SearchState.Finished &&  animationState === AnimationState.Finished  ?
@@ -46,24 +46,24 @@ const Header: React.FC<HeaderProps> = (
                             {
                                 extraSearchResultData.total > 0 ?
                                     <>
-                                        <Text as={'span'} color={'green.400'}>
+                                        <chakra.span color={'green.400'}>
                                             {extraSearchResultData.total} matching {extraSearchResultData.total > 1 ? 'results' : 'result'}  found.
-                                        </Text>
+                                        </chakra.span>
                                     </>
                                     :
                                     <>
-                                        <Text as={'span'} color={'red.400'}>
+                                        <chakra.span as={'span'} color={'red.400'}>
                                             No matching results found.
-                                        </Text>
+                                        </chakra.span>
                                     </>
                             }
                         </>
                         :
                     <>
                         Type something to initiate<br/>
-                        <Text as={'span'} color={'brand.400'}>
+                        <chakra.span color={'brand.400'}>
                             Hyper Searching
-                        </Text>
+                        </chakra.span>
                     </>
             }
         </Heading>

@@ -140,7 +140,6 @@ export default function CallToActionWithAnnotation() {
             <ChakraBaseProvider theme={theme}>
                 <Container maxW={'5xl'}>
                     <Stack
-                        as={Box}
                         transition={'margin-top 0.2s ease-in-out'}
                         marginTop={animationState === AnimationState.Finished ? '0' : '20vh' }
                         textAlign="center"
