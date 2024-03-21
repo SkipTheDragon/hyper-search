@@ -1,10 +1,11 @@
-import {Box, Button, Collapse, Grid, GridItem, Heading, Icon, Text, useColorModeValue} from "@chakra-ui/react";
+import {Box, Button, Collapse, Grid, GridItem, Icon, List, Text, useColorModeValue} from "@chakra-ui/react";
 import {
     IoBulbSharp,
     IoCardSharp,
     IoChatbubblesSharp,
-    IoDocumentTextSharp, IoMapSharp, IoNewspaperSharp,
-    IoRadioSharp,
+    IoDocumentTextSharp,
+    IoMapSharp,
+    IoNewspaperSharp,
     IoTextSharp
 } from "react-icons/io5";
 import React from "react";
@@ -12,6 +13,7 @@ import {SearchIcon} from "@chakra-ui/icons";
 import NotFound from "./NotFound";
 import Bar from "./Bar";
 import ResultItem from "./ResultItem";
+import {AnimationState, ExtraData, SearchState} from "../controllers/SearchController";
 
 export interface SearchResultProps {
     _id: string;
@@ -25,14 +27,18 @@ export interface SearchResultProps {
 }
 
 export interface ResultProps {
-    isWarpStarted: boolean;
+    animationState: AnimationState;
     data: SearchResultProps[];
+    extraSearchResultData: ExtraData;
+    setReactiveValue: React.Dispatch<React.SetStateAction<string>>
 }
 
 const Result: React.FC<ResultProps> = (
     {
-        isWarpStarted,
+        animationState,
         data,
+        extraSearchResultData,
+        setReactiveValue
     }) => {
     const buttonData: {
             id: number;
@@ -55,7 +61,7 @@ const Result: React.FC<ResultProps> = (
     const [currentLocation, setCurrentLocation] = React.useState<string | null>(null);
 
     return (
-        <Collapse in={isWarpStarted}>
+        <Collapse in={animationState === AnimationState.Finished}>
             <Box
                 color='white'
                 bg={bgColor}
@@ -119,10 +125,13 @@ const Result: React.FC<ResultProps> = (
                     </GridItem>
 
                     {
-                        data.length === 0 ?
-                            <NotFound/>
+                        data.length === 0 || (currentLocation !== null && data.filter(result => result._source.location === currentLocation).length === 0) ?
+                            <NotFound currentCategory={currentLocation}
+                                      setCurrentLocation={setCurrentLocation}
+                                      suggestions={extraSearchResultData.suggestions}
+                                      setReactiveValue={setReactiveValue}/>
                             :
-                            <Grid gap={0}  maxHeight={'500px'} overflowY={'auto'}>
+                            <List gap={0} maxHeight={'500px'} overflowY={'auto'}>
                                 {data.map((result, index) => (
                                     <React.Fragment key={index}>
                                         {
@@ -136,7 +145,7 @@ const Result: React.FC<ResultProps> = (
                                         }
                                     </React.Fragment>
                                 ))}
-                            </Grid>
+                            </List>
                     }
 
                     <GridItem

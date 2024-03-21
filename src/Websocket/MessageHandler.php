@@ -2,15 +2,11 @@
 
 namespace App\Websocket;
 
+use App\Service\SearchService;
 use Exception;
-use Manticoresearch\Client;
-use Manticoresearch\Query\BoolQuery;
-use Manticoresearch\Query\MatchQuery;
-use Manticoresearch\Search;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use SplObjectStorage;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /*
  * Inspired by https://rojas.io/symfony-5-websockets-tutorial/
@@ -21,7 +17,7 @@ class MessageHandler implements MessageComponentInterface
     protected SplObjectStorage $connections;
 
     public function __construct(
-        protected ParameterBagInterface $parameterBag
+        protected readonly SearchService $searchService,
     )
     {
         $this->connections = new SplObjectStorage;
@@ -34,37 +30,49 @@ class MessageHandler implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $from, $msg): void
     {
+        $start = microtime(true);
+
         foreach ($this->connections as $connection) {
             if ($from != $connection) {
                 continue;
             }
+            try {
+                $manticoreResponse = $this->searchService->search($msg);
 
-            $manticoreConfig = $this->parameterBag->get('manticore');
-            $config = ['host' => $manticoreConfig['host'], 'port' => $manticoreConfig['port']];
+                $result = $manticoreResponse['hits']['hits'];
 
-            $client = new Client($config);
-            $search = new Search($client);
-            $search->setIndex('links');
+                $responseTime = microtime(true) - $start;
 
-            $q = new BoolQuery();
-            $q->must(new MatchQuery(['query' => $msg . '~ 10', 'operator' => 'or'], '*'));
-            $response = $search->search($q)->get();
-            $manticoreResponse = $response->getResponse()->getResponse();
+                $connection->send(json_encode([
+                    'status' => 'success',
+                    'data' => $result,
+                    'extraData' => [
+                        'executionTime' => [
+                            'took' => number_format($responseTime, 4). 'ms',
+                            'tookRaw' => $responseTime
+                        ],
+                        'suggestions' => $this->searchService->suggest($msg),
+                        'total' => $manticoreResponse['hits']['total']
+                    ]
+                ]));
+            } catch (Exception $e) {
+                $responseTime = microtime(true) - $start;
 
-            if (!isset($manticoreResponse['hits']) || $manticoreResponse['hits']['total'] === 0) {
                 $connection->send(json_encode([
                     'status' => 'error',
-                    'message' => 'Nothing found for this search term.'
+                    'message' => $e->getMessage(),
+                    'data' => [],
+                    'extraData' => [
+                        'suggestions' => $this->searchService->suggest($msg),
+                        'executionTime' => [
+                            'took' => number_format($responseTime, 4). 'ms',
+                            'tookRaw' => $responseTime
+                        ],
+                        'total' => 0
+                    ]
                 ]));
-
                 continue;
             }
-
-            $result = $manticoreResponse['hits']['hits'];
-            $connection->send(json_encode([
-                'status' => 'success',
-                'data' => $result
-            ]));
         }
 
     }

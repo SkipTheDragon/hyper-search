@@ -11,8 +11,7 @@ services:
   appserver:
     run:
       - composer install
-      - bin/console manticore:migrate
-      - bin/console manticore:seed
+      - bin/console manticore:create-and-seed
     overrides:
       ports:
         - 1241

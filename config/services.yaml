@@ -9,6 +9,7 @@ parameters:
         port: 9308
     app:
         host: hyper-search.lndo.site
+        websocket: "ws://ws.lndo.site"
 
 services:
     # default configuration for services in *this* file

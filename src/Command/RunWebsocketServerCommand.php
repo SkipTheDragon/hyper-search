@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Service\SearchService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,7 +23,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class RunWebsocketServerCommand extends Command
 {
     public function __construct(
-        protected ParameterBagInterface $parameterBag
+        protected SearchService $searchService
     )
     {
         parent::__construct();
@@ -32,11 +33,12 @@ class RunWebsocketServerCommand extends Command
     {
         $port = 1241;
         $output->writeln("Starting server on port " . $port);
+
         $server = IoServer::factory(
             new HttpServer(
                 new WsServer(
                     new MessageHandler(
-                        $this->parameterBag
+                        $this->searchService
                     )
                 )
             ),

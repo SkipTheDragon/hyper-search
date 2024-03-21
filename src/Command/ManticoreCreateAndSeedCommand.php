@@ -6,18 +6,16 @@ use App\Architecture\Locations;
 use Manticoresearch\Client;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 #[AsCommand(
-    name: 'manticore:seed',
+    name: 'manticore:create-and-seed',
     description: 'Add a short description for your command',
 )]
-class ManticoreSeedCommand extends Command
+class ManticoreCreateAndSeedCommand extends Command
 {
     public function __construct(
         protected readonly ParameterBagInterface $parameterBag,
@@ -35,6 +33,31 @@ class ManticoreSeedCommand extends Command
         $client = new Client($config);
 
         $index = $client->index('links');
+
+        $index->drop();
+
+        $index->create(
+            [
+                'location' => [
+                    'type' => 'text'
+                ],
+                'title' => [
+                    'type' => 'text',
+                ],
+                'description' => [
+                    'type' => 'text',
+                ],
+                'link' => [
+                    'type' => 'text'
+                ],
+            ],
+            [ // Allows keyword suggestions
+                'dict' => 'keywords',
+                'min_infix_len' => 2
+            ]
+        );
+
+        $io->success('Index created.');
 
         $index->addDocuments([
             ['location' => Locations::CHANGELOGS, 'title' => 'Version 1.0.0', 'description' => 'Finally released the first version!', 'link' => 'https://en.wikipedia.org/wiki/New_York'],

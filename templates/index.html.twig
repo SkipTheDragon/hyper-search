@@ -1,10 +1,17 @@
 {% extends 'base.html.twig' %}
 
+
+
 {% block body %}
+    {#    TODO: #}
+    {#    - Use React transition? #}
+    {#    - Implement state management #}
+    {#    - Stop search design #}
+    {#    - mirror bitbucket to github #}
+    {#    - optimize imports #}
+    {#    - autocomplete #}
     <script>
-        window.APP_SETTINGS = {
-            API_URL: '{{ app_host }}',
-        }
+        window.config = {{ config|json_encode|raw }}
     </script>
 
     <div {{ react_component('SearchController', {}) }}>

@@ -17,7 +17,9 @@ class MainController extends AbstractController
     public function index(): Response
     {
         return $this->render('index.html.twig', [
-            'app_host' => $this->getParameter('app')['host']
+            'config' => [
+                'app' => $this->getParameter('app')
+            ]
         ]);
     }
 

@@ -1,6 +1,6 @@
 import React from "react";
 import {SearchResultProps} from "./Result";
-import {Button, GridItem, Heading, Icon, Text, useColorModeValue} from "@chakra-ui/react";
+import {Button, GridItem, Heading, Icon, ListItem, Text, useColorModeValue} from "@chakra-ui/react";
 import {FaArrowRight} from "react-icons/fa6";
 import {chakra} from "@chakra-ui/react";
 
@@ -15,7 +15,7 @@ const Result: React.FC<SearchResultProps['_source']> = (
     const heading = useColorModeValue('gray.800','secondaryGray.200' );
 
     return (
-        <GridItem
+        <ListItem
             w='100%'
             padding={'1rem'}
             borderBottom={'1px'}
@@ -40,15 +40,17 @@ const Result: React.FC<SearchResultProps['_source']> = (
                 </Heading>
                 <Text
                     color={'gray.500'}
-                    marginBottom={'0.5rem'}
                 >
                     {description}
+                </Text>
+                <Text color={'gray.500'}>
+                    In: <b>{location}</b>
                 </Text>
             </chakra.div>
             <Button as={'a'} target={'_blank'} href={link}>
                 <Icon as={FaArrowRight} />
             </Button>
-        </GridItem>
+        </ListItem>
     );
 }
 
