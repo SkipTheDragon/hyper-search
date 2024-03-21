@@ -121,6 +121,7 @@ const SearchBar: React.FC<SearchBarProps> = (
                 bg={searchBg}
                 ref={searchBoxRef}
                 id="hyper-search"
+                fontSize={"1rem"}
                 size="lg"
                 placeholder={returnRandomMessage()}
             />
