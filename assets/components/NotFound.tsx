@@ -1,15 +1,15 @@
 import {Badge, GridItem, Heading, Icon, Text, useColorModeValue, chakra} from "@chakra-ui/react";
 import {IoRadioSharp} from "react-icons/io5";
 import React from "react";
+import {useAnimationStore} from "../stores/animationStore";
+import {useWebsocketStore} from "../stores/websocketStore";
 
 export default function NotFound(
     {
-        suggestions,
         currentCategory,
         setReactiveValue,
         setCurrentLocation
     }: {
-        suggestions: object,
         currentCategory: string | null,
         setReactiveValue: React.Dispatch<React.SetStateAction<string>>
         setCurrentLocation: React.Dispatch<React.SetStateAction<string | null>>
@@ -18,6 +18,8 @@ export default function NotFound(
     const bgColor = useColorModeValue('secondaryGray.300', 'navy.800');
     const textColor = useColorModeValue('gray.900', 'gray.200');
     const iconColor = useColorModeValue('gray.200', 'gray.500');
+    const websocketStore = useWebsocketStore();
+    const suggestions = Object.keys(websocketStore.states.lastMessage?.extraData.suggestions);
 
     return <GridItem
         w='100%'
@@ -46,7 +48,7 @@ export default function NotFound(
             </Text>
             <chakra.div marginTop={'1.5rem'}>
                 {
-                    Object.keys(suggestions).length === 0 ?
+                    suggestions.length === 0 ?
                         <Text color={'red.500'} margin="auto">
                             We couldn't find any suggestions for related to your query 😞.
                             Please try something else.
@@ -58,7 +60,7 @@ export default function NotFound(
                             </Text>
                             <chakra.div  marginTop={'0.5rem'}>
                                 {
-                                    Object.keys(suggestions).map((suggestion, index) => (
+                                    suggestions.map((suggestion, index) => (
                                         <Badge
                                             key={index}
                                             _hover={{cursor: 'pointer'}}

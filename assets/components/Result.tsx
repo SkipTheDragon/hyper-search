@@ -13,31 +13,15 @@ import {SearchIcon} from "@chakra-ui/icons";
 import NotFound from "./NotFound";
 import Bar from "./Bar";
 import ResultItem from "./ResultItem";
-import {AnimationState, ExtraData, SearchState} from "../pages/search";
-
-export interface SearchResultProps {
-    _id: string;
-    _score: number;
-    _source: {
-        description: string;
-        title: string;
-        location: string;
-        link: string;
-    }
-}
+import {AnimationState, useAnimationStore} from "../stores/animationStore";
+import {useWebsocketStore} from "../stores/websocketStore";
 
 export interface ResultProps {
-    animationState: AnimationState;
-    data: SearchResultProps[];
-    extraSearchResultData: ExtraData;
     setReactiveValue: React.Dispatch<React.SetStateAction<string>>
 }
 
 const Result: React.FC<ResultProps> = (
     {
-        animationState,
-        data,
-        extraSearchResultData,
         setReactiveValue
     }) => {
     const buttonData: {
@@ -60,8 +44,11 @@ const Result: React.FC<ResultProps> = (
     const bgColorHover = useColorModeValue('gray.200', 'navy.800');
     const [currentLocation, setCurrentLocation] = React.useState<string | null>(null);
 
+    const animationStore = useAnimationStore();
+    const websocketStore = useWebsocketStore();
+
     return (
-        <Collapse in={animationState === AnimationState.Finished}>
+        <Collapse in={animationStore.states.animation === AnimationState.Finished}>
             <Box
                 color='white'
                 bg={bgColor}
@@ -117,7 +104,7 @@ const Result: React.FC<ResultProps> = (
                                                 fontSize: '0.65rem',
                                                 textAlign: 'left',
                                             }
-                                        }>{data.filter(result => result._source.location === button.label).length} results</Text>
+                                        }>{websocketStore.states.lastMessage?.data?.filter(result => result._source.location === button.label).length} results</Text>
                                 </div>
 
                             </Button>
@@ -125,14 +112,13 @@ const Result: React.FC<ResultProps> = (
                     </GridItem>
 
                     {
-                        data.length === 0 || (currentLocation !== null && data.filter(result => result._source.location === currentLocation).length === 0) ?
+                        websocketStore.states.lastMessage?.data?.length === 0 || (currentLocation !== null && websocketStore.states.lastMessage?.data?.filter(result => result._source.location === currentLocation).length === 0) ?
                             <NotFound currentCategory={currentLocation}
                                       setCurrentLocation={setCurrentLocation}
-                                      suggestions={extraSearchResultData.suggestions}
                                       setReactiveValue={setReactiveValue}/>
                             :
                             <List gap={0} maxHeight={'500px'} overflowY={'auto'}>
-                                {data.map((result, index) => (
+                                {websocketStore.states.lastMessage?.data?.map((result, index) => (
                                     <React.Fragment key={index}>
                                         {
                                             currentLocation === null ?

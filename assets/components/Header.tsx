@@ -1,23 +1,22 @@
 import {Heading, Text, useColorModeValue} from "@chakra-ui/react";
 import React from "react";
-import {AnimationState, ExtraData, SearchState} from "../pages/search";
+import {ExtraData} from "../pages/search";
 import {chakra} from "@chakra-ui/react";
+import {AnimationState, SearchState, useAnimationStore} from "../stores/animationStore";
+import {useWebsocketStore} from "../stores/websocketStore";
 
 export interface HeaderProps {
-    searchState: SearchState;
-    animationState: AnimationState;
     tr: any;
-    extraSearchResultData: ExtraData;
 }
 
 const Header: React.FC<HeaderProps> = (
     {
-        searchState,
-        animationState,
         tr,
-        extraSearchResultData
     }
 ) => {
+    const animationStore = useAnimationStore();
+    const websocketStore = useWebsocketStore();
+
     const headingColorUnfocused = useColorModeValue(
         'black',
         'white'
@@ -27,12 +26,12 @@ const Header: React.FC<HeaderProps> = (
         <Heading
             style={tr}
             transition={'color 0.2s ease-in-out'}
-            color={animationState !== AnimationState.NotRunning ?  'white' : headingColorUnfocused}
+            color={animationStore.states.animation !== AnimationState.NotRunning ?  'white' : headingColorUnfocused}
             fontWeight={600}
             fontSize={{base: '2xl', sm: '4xl', md: '6xl'}}
             lineHeight={'110%'}>
             {
-                animationState === AnimationState.Running ?
+                animationStore.states.animation === AnimationState.Running ?
                     <>
                         Hyper Searching Initiated... <br/>
                         <chakra.span color={'brand.400'}>
@@ -40,14 +39,14 @@ const Header: React.FC<HeaderProps> = (
                         </chakra.span>
                     </>
                     :
-                    searchState === SearchState.Finished &&  animationState === AnimationState.Finished  ?
+                    animationStore.states.search === SearchState.Finished &&  animationStore.states.animation === AnimationState.Finished  ?
                         <>
                            Search Finished!<br/>
                             {
-                                extraSearchResultData.total > 0 ?
+                                websocketStore.states.lastMessage?.extraData.total > 0 ?
                                     <>
                                         <chakra.span color={'green.400'}>
-                                            {extraSearchResultData.total} matching {extraSearchResultData.total > 1 ? 'results' : 'result'}  found.
+                                            {websocketStore.states.lastMessage?.extraData.total} matching {websocketStore.states.lastMessage?.extraData.total > 1 ? 'results' : 'result'}  found.
                                         </chakra.span>
                                     </>
                                     :

@@ -1,13 +1,12 @@
 import {
-    Box,
-    Container,
-    Text,
-    Stack,
     ChakraBaseProvider,
+    ColorModeScript,
+    Container,
     Fade,
     Flex,
+    Stack,
+    Text,
     usePrefersReducedMotion,
-    ColorModeScript,
 } from '@chakra-ui/react';
 import theme from "../theme/theme";
 import React, {useEffect, useRef} from "react";
@@ -16,18 +15,9 @@ import Result, {SearchResultProps} from "../components/Result";
 import Header from "../components/Header";
 import {useDebounce} from "use-debounce";
 import StarsScene from "../functions/animations/stars/StarsScene";
+import {AnimationState, SearchBoxState, SearchState, useAnimationStore} from "../stores/animationStore";
+import {useWebsocketStore, WebsocketState} from "../stores/websocketStore";
 
-export enum SearchState {
-    Waiting,
-    Searching,
-    Finished,
-}
-
-export enum AnimationState {
-    NotRunning,
-    Running,
-    Finished,
-}
 export interface ExtraData {
     status: string;
     executionTime: {
@@ -37,22 +27,12 @@ export interface ExtraData {
     suggestions: object,
     total: number
 }
+
 export default function CallToActionWithAnnotation() {
-    const [isSearchFocused, setIsSearchFocused] = React.useState(false);
-
-    const [data, setData] = React.useState<SearchResultProps[]>([]);
-    const [extraData, setExtraData] = React.useState<ExtraData>({
-        status: "error",
-        executionTime: {
-            took: "0ms",
-            tookRaw: 0
-        },
-        suggestions: [],
-        total: 0
-    });
-
-    const [searchState, setSearchState] = React.useState(SearchState.Waiting);
-    const [animationState, setAnimationState] = React.useState(AnimationState.NotRunning);
+    const reducedMotion = usePrefersReducedMotion();
+    const websocketStore = useWebsocketStore();
+    const animationStore = useAnimationStore();
+    const canvasRef = useRef(null)
 
     const [reactiveValue, setReactiveValue] = React.useState("")
     const [value] = useDebounce(reactiveValue, 1000);
@@ -61,22 +41,6 @@ export default function CallToActionWithAnnotation() {
         transitionProperty: "var(--chakra-transition-property-common)",
         transitionDuration: "var(--chakra-transition-duration-normal)"
     }
-
-    const canvasRef = useRef(null)
-    const reducedMotion = usePrefersReducedMotion();
-
-    const [socket, setSocket] = React.useState<WebSocket|null>(null);
-
-    // Connect to the WebSocket server
-    useEffect(() => {
-        const newSocket =  new WebSocket(window["config"].app.websocket);
-        setSocket(newSocket);
-
-
-        return () => {
-            newSocket.close();
-        };
-    }, []);
 
     // Add searching animation to the background
     useEffect(() => {
@@ -93,46 +57,39 @@ export default function CallToActionWithAnnotation() {
         const stars = new StarsScene(canvasRef.current);
 
         // If the user is searching, animate the background.
-        if (searchState === SearchState.Searching) {
-            setAnimationState(AnimationState.Running);
+        if (animationStore.states.search === SearchState.Searching) {
+            animationStore.animation.start();
             stars.animate();
         }
 
         // If the search stopped, stop the animation.
-        if (searchState === SearchState.Finished) {
+        if (animationStore.states.search === SearchState.Finished) {
             // Add a delay so the animation doesn't end too fast.
             setTimeout(() => {
-                setAnimationState(AnimationState.Finished);
+                animationStore.animation.finish();
             }, 5000);
         }
-    }, [value, isSearchFocused, animationState, searchState, canvasRef, reducedMotion]);
+    }, [value, animationStore.states.search, canvasRef, reducedMotion]);
 
-    // Listen for messages from the WebSocket server
-    useEffect(() => {
-        if (socket) {
-            // Listen for messages from the WebSocket server
-            socket.onmessage = (event) => {
-                const response = JSON.parse(event.data);
-                setSearchState(SearchState.Finished);
-
-                setExtraData({
-                    status: response.status,
-                    ...response.extraData
-                });
-                setData(response.data);
-            };
-        }
-    }, [socket]);
 
     // Send the search query to the WebSocket server
     useEffect(() => {
         if (value.length < 1) return;
 
-        if (socket) {
-            socket.send(value);
-            setSearchState(SearchState.Searching);
-        }
-    }, [value,socket]);
+        websocketStore.actions.searchQuery(value);
+        animationStore.search.start();
+
+    }, [value]);
+
+    useEffect(() => {
+        websocketStore.states.socket.onmessage = (event) => {
+            websocketStore.actions.saveReply(JSON.parse(event.data))
+
+            setTimeout(() => {
+                animationStore.animation.finish()
+            }, 5000)
+        };
+    }, []);
 
     return (
         <>
@@ -141,34 +98,23 @@ export default function CallToActionWithAnnotation() {
                 <Container maxW={'5xl'}>
                     <Stack
                         transition={'margin-top 0.2s ease-in-out'}
-                        marginTop={animationState === AnimationState.Finished ? '0' : '20vh' }
+                        marginTop={animationStore.states.animation === AnimationState.Finished ? '0' : '20vh'}
                         textAlign="center"
                         spacing={{base: 8, md: 14}}
                         py={{base: 20, md: 36}}>
-                        <Header
-                            searchState={searchState}
-                            animationState={animationState}
-                            extraSearchResultData={extraData}
-                            tr={tr}
-                        />
+                        <Header tr={tr}/>
                         <Container
                             transition={'max-width 0.2s ease-in-out'}
-                            maxW={isSearchFocused || searchState ? '4xl' : '2xl'}>
+                            maxW={animationStore.states.searchBox === SearchBoxState.Focused || animationStore.states.search !== SearchState.Waiting ? '4xl' : '2xl'}>
                             <Flex direction={'column'}>
-                                <SearchBar animationState={animationState}
-                                           isSearchFocused={isSearchFocused}
-                                           setIsSearchFocused={setIsSearchFocused}
-                                           setValue={setReactiveValue}
-                                           extraSearchResultData={extraData}
-                                           value={reactiveValue} tr={tr}/>
-                                <Result data={data}
-                                        animationState={animationState}
-                                        extraSearchResultData={extraData}
-                                        setReactiveValue={setReactiveValue}
-                                />
+                                <SearchBar
+                                    setValue={setReactiveValue}
+                                    value={reactiveValue} tr={tr}/>
+                                <Result setReactiveValue={setReactiveValue}/>
                             </Flex>
                         </Container>
-                        <Fade in={!isSearchFocused && !searchState}>
+                        <Fade
+                            in={animationStore.states.search === SearchState.Waiting}>
                             <Text color={'gray.500'} width="75%" margin="auto">
                                 Query enables fast searches across our documentations, knowledge bases, tickets, and
                                 forums. Instantly access relevant information with an efficient interface, making it
@@ -178,13 +124,13 @@ export default function CallToActionWithAnnotation() {
                         </Fade>
                     </Stack>
                 </Container>
-                    <canvas ref={canvasRef} style={{
-                        transition: 'all 0.2s ease-in-out',
-                        visibility: animationState !== AnimationState.NotRunning ? 'visible' : 'hidden',
-                        opacity: animationState !== AnimationState.NotRunning ? '1' : '0',
-                        zIndex: -1,
-                        filter: "brightness(0.8)"
-                    }} id="bg"/>
+                <canvas ref={canvasRef} style={{
+                    transition: 'all 0.2s ease-in-out',
+                    visibility: animationStore.states.animation !== AnimationState.NotRunning ? 'visible' : 'hidden',
+                    opacity: animationStore.states.animation !== AnimationState.NotRunning ? '1' : '0',
+                    zIndex: -1,
+                    filter: "brightness(0.8)"
+                }} id="bg"/>
             </ChakraBaseProvider>
         </>
     );
