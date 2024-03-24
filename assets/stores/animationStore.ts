@@ -38,6 +38,9 @@ export interface AnimationStoreState {
     }
 }
 
+/**
+ * Store for the states related to animations.
+ */
 export const useAnimationStore = create<AnimationStoreState>()(
     subscribeWithSelector(
     (set) => ({

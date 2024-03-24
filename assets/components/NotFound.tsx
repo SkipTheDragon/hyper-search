@@ -1,25 +1,49 @@
-import {Badge, GridItem, Heading, Icon, Text, useColorModeValue, chakra} from "@chakra-ui/react";
+import {Badge, GridItem, Heading, Icon, Text, useColorModeValue, chakra, Spinner} from "@chakra-ui/react";
 import {IoRadioSharp} from "react-icons/io5";
-import React from "react";
-import {useAnimationStore} from "../stores/animationStore";
-import {useWebsocketStore} from "../stores/websocketStore";
+import React, {useContext, useEffect} from "react";
+import { WebSocketContext} from "../stores/websocketStore";
+import {SuggestionPayload} from "../types/ws/messages/payloads/SuggestionPayload";
+import {MessageTypes} from "../types/ws/messages/MessageTypes";
 
 export default function NotFound(
     {
         currentCategory,
-        setReactiveValue,
         setCurrentLocation
     }: {
         currentCategory: string | null,
-        setReactiveValue: React.Dispatch<React.SetStateAction<string>>
         setCurrentLocation: React.Dispatch<React.SetStateAction<string | null>>
     }
 ) {
     const bgColor = useColorModeValue('secondaryGray.300', 'navy.800');
     const textColor = useColorModeValue('gray.900', 'gray.200');
     const iconColor = useColorModeValue('gray.200', 'gray.500');
-    const websocketStore = useWebsocketStore();
-    const suggestions = Object.keys(websocketStore.states.lastMessage?.extraData.suggestions);
+    const iconColors = useColorModeValue('gray.700', 'navy.100');
+
+    const websocketStore = useContext(WebSocketContext).getState();
+    const [loading, setLoading] = React.useState<boolean>(true);
+
+    useEffect(
+        () => {
+            setLoading(true);
+
+            websocketStore.actions.sendMessage<SuggestionPayload>({
+                type: MessageTypes.SuggestionsQuery,
+                payload: {
+                    term: websocketStore.states.mappedMessages.SEARCH_QUERY?.term || ''
+                }
+            });
+        },
+        [websocketStore.states.mappedResults.SEARCH_QUERY]
+    );
+
+    const rawSuggestions = websocketStore.states.mappedResults.SUGGESTION_QUERY?.suggestions;
+    const suggestions = Object.keys(rawSuggestions || {});
+
+    useEffect(() => {
+        if (websocketStore.states.mappedResults.SUGGESTION_QUERY?.suggestions !== undefined) {
+            setLoading(false)
+        }
+    }, [websocketStore.states.mappedResults.SUGGESTION_QUERY?.suggestions]);
 
     return <GridItem
         w='100%'
@@ -48,35 +72,50 @@ export default function NotFound(
             </Text>
             <chakra.div marginTop={'1.5rem'}>
                 {
-                    suggestions.length === 0 ?
-                        <Text color={'red.500'} margin="auto">
-                            We couldn't find any suggestions for related to your query 😞.
-                            Please try something else.
-                        </Text>
-                        :
+                    loading ?
                         <>
-                            <Text color={'gray.500'} w={"80%"} margin="auto">
-                                Here are some quick suggestions for you to try out:
+                            <Spinner
+                                size="xs"
+                                color={iconColors}/>
+                            <Text color={'gray.500'}>
+                                Loading suggestions...
                             </Text>
-                            <chakra.div  marginTop={'0.5rem'}>
-                                {
-                                    suggestions.map((suggestion, index) => (
-                                        <Badge
-                                            key={index}
-                                            _hover={{cursor: 'pointer'}}
-                                            colorScheme="gray"
-                                            onClick={() => {
-                                                setReactiveValue(suggestion)
-                                                setCurrentLocation(null)
-                                            }}
-                                            ml={2}
-                                        >
-                                            {suggestion}
-                                        </Badge>
-                                    ))
-                                }
-                            </chakra.div>
                         </>
+                        :
+                        suggestions.length === 0 ?
+                            <Text color={'red.500'} margin="auto">
+                                We couldn't find any suggestions for related to your query 😞.
+                                Please try something else.
+                            </Text>
+                            :
+                            <>
+                                <Text color={'gray.500'} w={"80%"} margin="auto">
+                                    Here are some quick suggestions for you to try out:
+                                </Text>
+                                <chakra.div marginTop={'0.5rem'}>
+                                    {
+                                        suggestions.map((suggestion, index) => (
+                                            <Badge
+                                                key={index}
+                                                _hover={{cursor: 'pointer'}}
+                                                colorScheme="gray"
+                                                onClick={() => {
+                                                    websocketStore.actions.sendMessage({
+                                                        type: MessageTypes.SearchQuery,
+                                                        payload: {
+                                                            term: suggestion
+                                                        }
+                                                    })
+                                                    setCurrentLocation(null)
+                                                }}
+                                                ml={2}
+                                            >
+                                                {suggestion}
+                                            </Badge>
+                                        ))
+                                    }
+                                </chakra.div>
+                            </>
 
                 }
             </chakra.div>

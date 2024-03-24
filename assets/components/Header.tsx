@@ -1,9 +1,8 @@
 import {Heading, Text, useColorModeValue} from "@chakra-ui/react";
-import React from "react";
-import {ExtraData} from "../pages/search";
+import React, {useContext} from "react";
 import {chakra} from "@chakra-ui/react";
 import {AnimationState, SearchState, useAnimationStore} from "../stores/animationStore";
-import {useWebsocketStore} from "../stores/websocketStore";
+import {WebSocketContext} from "../stores/websocketStore";
 
 export interface HeaderProps {
     tr: any;
@@ -15,12 +14,14 @@ const Header: React.FC<HeaderProps> = (
     }
 ) => {
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore();
+    const websocketStore = useContext(WebSocketContext).getState();
 
     const headingColorUnfocused = useColorModeValue(
         'black',
         'white'
     );
+
+    const total = websocketStore.states.mappedResults.SEARCH_QUERY?.extra?.total;
 
     return (
         <Heading
@@ -43,10 +44,10 @@ const Header: React.FC<HeaderProps> = (
                         <>
                            Search Finished!<br/>
                             {
-                                websocketStore.states.lastMessage?.extraData.total > 0 ?
+                                total !== undefined && total > 0  ?
                                     <>
                                         <chakra.span color={'green.400'}>
-                                            {websocketStore.states.lastMessage?.extraData.total} matching {websocketStore.states.lastMessage?.extraData.total > 1 ? 'results' : 'result'}  found.
+                                            {total} matching {total > 1 ? 'results' : 'result'}  found.
                                         </chakra.span>
                                     </>
                                     :

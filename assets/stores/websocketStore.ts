@@ -1,120 +1,138 @@
-import {create} from 'zustand'
+import {createStore} from 'zustand'
 import {subscribeWithSelector} from "zustand/middleware";
-import {SearchState} from "./animationStore";
+import {createContext} from "react";
+import createWs from "../functions/createWs";
+import {Results} from "../types/ws/results/Results";
+import {MappingResultsToType} from "../types/ws/results/MappingResultsToType";
+import {Payloads} from "../types/ws/messages/payloads/Payloads";
+import {MessageTypes} from "../types/ws/messages/MessageTypes";
+import {Message} from "../types/ws/messages/Message";
 
 export enum WebsocketState {
-    Uninitialized,
+    Connecting,
     Connected,
     Disconnected,
+    Uninitialized,
 }
 
 export interface WebsocketStoreState {
     states: {
         state: WebsocketState,
-        socket: WebSocket,
-        lastMessage: Data | null,
-        pastMessages: Data[],
+        socket: WebSocket|null,
+        pastMessages: Message<any>[],
+        pastResults: Results[],
+        mappedResults: Partial<{
+            [key in MessageTypes]: MappingResultsToType[key]
+        }>;
+        mappedMessages: Partial<{
+            [key in MessageTypes]: Message<any>['payload']
+        }>
     }
     actions: {
-        searchQuery: (term: string) => void,
-        saveReply: (socketReply: Data) => void,
+        reconnect: () => void,
+        sendMessage: <T extends Payloads>(message: Message<T>) => void,
+        saveResult: (result: Results) => void,
     },
     _internals: {
         _setSocketStatus: (status: WebsocketState) => void
-        _init: () => void
     }
 }
 
-export enum MessageTypes {
-    SearchQuery,
-    SuggestionsQuery
-}
+/**
+ * Store for the websocket connection.
+ */
+export const createWebsocketStore = () => {
 
-interface Data {
-    status: "success" | "error",
-    message?: string,
-    data?: {
-        _id: string;
-        _score: number;
-        _source: {
-            description: string;
-            title: string;
-            location: string;
-            link: string;
-        }
-    }[],
-    extraData: {
-        executionTime: {
-            took: string,
-            tookRaw: number
-        },
-        suggestions: object,
-        total: number
-    },
-}
-
-export const useWebsocketStore = create<WebsocketStoreState>()(
-    subscribeWithSelector((set, get) => ({
-        states: {
-            state: WebsocketState.Uninitialized,
-            socket: new WebSocket(window["config"].app.websocket),
-            lastMessage: null,
-            pastMessages: [],
-        },
-        actions: {
-            searchQuery: (term: string) => {
-                const store = get();
-
-                // Bind event listeners on socket
-                if (store.states.state === WebsocketState.Uninitialized) {
-                    store._internals._init()
-                }
-
-                store.states.socket.send(term)
-
-                return store;
+    const store =  createStore<WebsocketStoreState>()(
+        subscribeWithSelector((set, get) => ({
+            states: {
+                state: WebsocketState.Uninitialized,
+                socket: null,
+                pastMessages: [],
+                pastResults: [],
+                mappedResults: {},
+                mappedMessages: {}
             },
-            saveReply:
-                (socketReply) => set((store) => (
+            actions: {
+                reconnect: () => set((store) => {
+                    store._internals._setSocketStatus(WebsocketState.Connecting)
+
+                    setTimeout(() => {
+                        set((store) => {
+                            createWs(store)
+                            return store
+                        });
+                    }, 3000)
+
+                    return store;
+                }),
+                /**
+                 * Send a message to the websocket server
+                 * @param message
+                 */
+                sendMessage: <T extends Payloads>(message: Message<T>) => set((store) => {
+
+                    if (store.states.socket === null) {
+                        throw new Error("Socket not initialized")
+                    }
+
+                    store.states.socket.send(JSON.stringify(message))
+
+                    return {
+                        ...store,
+                        states: {
+                            ...store.states,
+                            mappedMessages: {
+                                ...store.states.mappedMessages,
+                                [message.type]: message.payload
+                            },
+                            pastMessages: [...store.states.pastMessages, message],
+                        }
+                    };
+                }),
+                /**
+                 * Save the result from the websocket message to the store
+                 * @param result
+                 */
+                saveResult:
+                    (result) => set((store) => (
+                        {
+                            ...store,
+                            states: {
+                                ...store.states,
+                                mappedResults: {
+                                    ...store.states.mappedResults,
+                                    [result.type]: result
+                                },
+                                pastResults: [...store.states.pastResults, result],
+                            }
+                        }
+                    )),
+            },
+            _internals: {
+                /**
+                 * Set the socket status
+                 * @param state
+                 */
+                _setSocketStatus: (state: WebsocketState) => set((store) => (
                     {
                         ...store,
                         states: {
                             ...store.states,
-                            lastMessage: socketReply,
-                            pastMessages: [...store.states.pastMessages, socketReply],
+                            state: state
                         }
                     }
                 )),
-        },
-        _internals: {
-            _init: () => {
-                const store = get();
+            }
+        }))
+    );
 
-                // If the socket is already initialized before we add the listener
-                if (store.states.socket.readyState === 1 && store.states.state === WebsocketState.Uninitialized) {
-                    store._internals._setSocketStatus(WebsocketState.Connected);
-                }
+    // Create the websocket connection
+    createWs(store)
 
-                // Add the listener just in case.
-                store.states.socket.addEventListener('open', () => {
-                    store._internals._setSocketStatus(WebsocketState.Connected);
-                })
+    return store;
+}
 
-                for (const event of ['ErrorEvent', 'CloseEvent']) {
-                    store.states.socket.addEventListener(event, () => {
-                        store._internals._setSocketStatus(WebsocketState.Disconnected);
-                    })
-                }
-            },
-            _setSocketStatus: (state: WebsocketState) => set((store) => (
-                {
-                    ...store,
-                    states: {
-                        ...store.states,
-                        state: state
-                    }
-                }
-            )),
-        }
-    }))
-)
+
+// @ts-ignore - This is a hack to get the store to work with the context.
+export const WebSocketContext = createContext<ReturnType<typeof createWebsocketStore>>(createWebsocketStore)

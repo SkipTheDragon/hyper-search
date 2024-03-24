@@ -8,22 +8,15 @@ import {
     IoNewspaperSharp,
     IoTextSharp
 } from "react-icons/io5";
-import React from "react";
+import React, {useContext} from "react";
 import {SearchIcon} from "@chakra-ui/icons";
 import NotFound from "./NotFound";
 import Bar from "./Bar";
 import ResultItem from "./ResultItem";
 import {AnimationState, useAnimationStore} from "../stores/animationStore";
-import {useWebsocketStore} from "../stores/websocketStore";
+import {WebSocketContext} from "../stores/websocketStore";
 
-export interface ResultProps {
-    setReactiveValue: React.Dispatch<React.SetStateAction<string>>
-}
-
-const Result: React.FC<ResultProps> = (
-    {
-        setReactiveValue
-    }) => {
+const Result = () => {
     const buttonData: {
             id: number;
             label: string;
@@ -45,7 +38,13 @@ const Result: React.FC<ResultProps> = (
     const [currentLocation, setCurrentLocation] = React.useState<string | null>(null);
 
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore();
+    const websocketStore = useContext(WebSocketContext).getState();
+
+    const lastSearchQueryData = websocketStore.states.mappedResults?.SEARCH_QUERY?.data;
+
+    if (lastSearchQueryData === undefined) {
+        return null;
+    }
 
     return (
         <Collapse in={animationStore.states.animation === AnimationState.Finished}>
@@ -104,7 +103,7 @@ const Result: React.FC<ResultProps> = (
                                                 fontSize: '0.65rem',
                                                 textAlign: 'left',
                                             }
-                                        }>{websocketStore.states.lastMessage?.data?.filter(result => result._source.location === button.label).length} results</Text>
+                                        }>{lastSearchQueryData.filter(result => result._source.location === button.label).length} results</Text>
                                 </div>
 
                             </Button>
@@ -112,13 +111,14 @@ const Result: React.FC<ResultProps> = (
                     </GridItem>
 
                     {
-                        websocketStore.states.lastMessage?.data?.length === 0 || (currentLocation !== null && websocketStore.states.lastMessage?.data?.filter(result => result._source.location === currentLocation).length === 0) ?
+                        lastSearchQueryData.length === 0 || (currentLocation !== null &&
+                            lastSearchQueryData.filter(result => result._source.location === currentLocation).length === 0) ?
                             <NotFound currentCategory={currentLocation}
                                       setCurrentLocation={setCurrentLocation}
-                                      setReactiveValue={setReactiveValue}/>
+                            />
                             :
-                            <List gap={0} maxHeight={'500px'} overflowY={'auto'}>
-                                {websocketStore.states.lastMessage?.data?.map((result, index) => (
+                            <List gap={0} maxHeight={'500px'} overflowY="auto">
+                                {lastSearchQueryData.map((result, index) => (
                                     <React.Fragment key={index}>
                                         {
                                             currentLocation === null ?

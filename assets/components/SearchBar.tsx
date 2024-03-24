@@ -9,23 +9,21 @@ import {
     useColorModeValue
 } from "@chakra-ui/react";
 import {SearchIcon} from "@chakra-ui/icons";
-import React, {MutableRefObject, useCallback, useEffect, useRef} from "react";
-import {ExtraData} from "../pages/search";
-import {AnimationState, SearchBoxState, SearchState, useAnimationStore} from "../stores/animationStore";
+import React, {MutableRefObject, useCallback, useContext, useEffect, useRef} from "react";
+import {AnimationState, SearchBoxState, useAnimationStore} from "../stores/animationStore";
 import hotkeyPress from "../functions/hotkeyPress";
 import randomMessage from "../functions/randomMessage";
-import {useWebsocketStore} from "../stores/websocketStore";
+import {WebSocketContext} from "../stores/websocketStore";
+import {useDebounce} from "use-debounce";
+import {SearchPayload} from "../types/ws/messages/payloads/SearchPayload";
+import {MessageTypes} from "../types/ws/messages/MessageTypes";
 
 export interface SearchBarProps {
-    setValue: (val: string) => void
-    value: string;
     tr: any;
 }
 
 const SearchBar: React.FC<SearchBarProps> = (
     {
-        setValue,
-        value,
         tr
     }) => {
 
@@ -43,11 +41,28 @@ const SearchBar: React.FC<SearchBarProps> = (
     const iconColors = useColorModeValue('gray.700', 'navy.100');
 
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore();
+    const websocketStore = useContext(WebSocketContext).getState();
 
     const isMac = navigator.userAgent.includes('Mac') // true
 
     const returnRandomMessage = useCallback(randomMessage, []);
+
+    const [reactiveValue, setReactiveValue] = React.useState("")
+    const [value] = useDebounce(reactiveValue, 1000);
+
+    useEffect(() => {
+        if (value.length < 1) return;
+
+        websocketStore.actions.sendMessage<SearchPayload>({
+            type: MessageTypes.SearchQuery,
+            payload: {
+                term: value
+            }
+        });
+
+        animationStore.search.start();
+
+    }, [value]);
 
     return (
         <InputGroup size="lg" className={'search-input'}>
@@ -69,8 +84,8 @@ const SearchBar: React.FC<SearchBarProps> = (
             <Input
                 onBlur={() => animationStore.searchBox.blur()}
                 onFocus={() => animationStore.searchBox.focus()}
-                onChange={(e) => setValue(e.target.value)}
-                value={value}
+                onChange={(e) => setReactiveValue(e.target.value)}
+                value={reactiveValue}
                 color={searchTextColor}
                 borderBottomRadius={animationStore.states.animation === AnimationState.Finished ? '0' : 'md'}
                 bg={searchBg}
@@ -93,11 +108,13 @@ const SearchBar: React.FC<SearchBarProps> = (
                         </div>
                     }
                     {
-                        animationStore.states.searchBox === SearchBoxState.Focused && animationStore.states.animation === AnimationState.Finished &&
+                        animationStore.states.searchBox === SearchBoxState.Focused &&
+                        animationStore.states.animation === AnimationState.Finished &&
+                        websocketStore.states.mappedResults.SEARCH_QUERY &&
                         <Badge
                             colorScheme="green"
                             variant="subtle">
-                            Took: {websocketStore.states.lastMessage?.extraData.executionTime.took}
+                            Took: {websocketStore.states.mappedResults?.SEARCH_QUERY?.extra.executionTime.took}
                         </Badge>
                     }
 

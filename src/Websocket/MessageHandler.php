@@ -2,6 +2,8 @@
 
 namespace App\Websocket;
 
+use App\Message\SearchMessage;
+use App\Message\SuggestionMessage;
 use App\Service\SearchService;
 use Exception;
 use Ratchet\ConnectionInterface;
@@ -15,6 +17,15 @@ use SplObjectStorage;
 class MessageHandler implements MessageComponentInterface
 {
     protected SplObjectStorage $connections;
+
+    protected const REQUIRED_ARRAY_KEYS = [
+        'type'
+    ];
+
+    protected const MESSAGE_TYPES = [
+        SearchMessage::class,
+        SuggestionMessage::class
+    ];
 
     public function __construct(
         protected readonly SearchService $searchService,
@@ -36,39 +47,38 @@ class MessageHandler implements MessageComponentInterface
             if ($from != $connection) {
                 continue;
             }
+
+
             try {
-                $manticoreResponse = $this->searchService->search($msg);
+                $decodedMessage = json_decode($msg, true);
 
-                $result = $manticoreResponse['hits']['hits'];
+                foreach (self::REQUIRED_ARRAY_KEYS as $requiredKey) {
+                    if (!array_key_exists($requiredKey, $decodedMessage)) {
+                        throw new Exception('Malformed request!');
+                    }
+                }
 
-                $responseTime = microtime(true) - $start;
+                foreach (self::MESSAGE_TYPES as $message) {
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    if ($message::getMessageType() === $decodedMessage['type']) {
+                        $messageInstance = new $message($this->searchService);
+                        $messageInstance->execute($connection, $decodedMessage['payload'] ?? []);
+                        break;
+                    }
+                }
 
-                $connection->send(json_encode([
-                    'status' => 'success',
-                    'data' => $result,
-                    'extraData' => [
-                        'executionTime' => [
-                            'took' => number_format($responseTime, 4). 'ms',
-                            'tookRaw' => $responseTime
-                        ],
-                        'suggestions' => $this->searchService->suggest($msg),
-                        'total' => $manticoreResponse['hits']['total']
-                    ]
-                ]));
             } catch (Exception $e) {
                 $responseTime = microtime(true) - $start;
 
                 $connection->send(json_encode([
                     'status' => 'error',
-                    'message' => $e->getMessage(),
+                    'message' => 'Something went extremely wrong. This incident has been reported!',
                     'data' => [],
-                    'extraData' => [
-                        'suggestions' => $this->searchService->suggest($msg),
+                    'extra' => [
                         'executionTime' => [
                             'took' => number_format($responseTime, 4). 'ms',
                             'tookRaw' => $responseTime
                         ],
-                        'total' => 0
                     ]
                 ]));
                 continue;
