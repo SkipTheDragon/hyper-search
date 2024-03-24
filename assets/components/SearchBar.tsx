@@ -52,7 +52,11 @@ const SearchBar: React.FC<SearchBarProps> = (
     const [value] = useDebounce(searchStore.states.search, 1000);
 
     useEffect(() => {
-        if (value.length < 1) return;
+        if (value.length === 0) {
+            animationStore.search.reset();
+            animationStore.animation.reset();
+            return;
+        }
 
         websocketStore.actions.sendMessage<SearchPayload>({
             type: MessageTypes.SearchQuery,

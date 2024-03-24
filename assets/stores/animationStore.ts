@@ -27,10 +27,12 @@ export interface AnimationStoreState {
     search: {
         start: () => void
         finish: () => void
+        reset: () => void
     }
     animation: {
         start: () => void
         finish: () => void
+        reset: () => void
     }
     searchBox: {
         focus: () => void
@@ -62,6 +64,12 @@ export const useAnimationStore = create<AnimationStoreState>()(
                     search: SearchState.Finished,
                 }
             })),
+            reset: () => set((store) => ({
+                states: {
+                    ...store.states,
+                    search: SearchState.Waiting,
+                }
+            })),
         },
         animation: {
             start: () => set((store) => ({
@@ -74,6 +82,12 @@ export const useAnimationStore = create<AnimationStoreState>()(
                 states: {
                     ...store.states,
                     animation: AnimationState.Finished,
+                }
+            })),
+            reset: () => set((store) => ({
+                states: {
+                    ...store.states,
+                    animation: AnimationState.NotRunning,
                 }
             })),
         },

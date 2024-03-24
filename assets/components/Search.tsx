@@ -51,7 +51,6 @@ export default function Search() {
             stars.animate();
         }
 
-        console.log(animationStore.states)
         // If the search stopped, stop the animation.
         if (animationStore.states.search === SearchState.Finished) {
             // Add a delay so the animation doesn't end too fast.
