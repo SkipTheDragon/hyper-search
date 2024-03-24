@@ -14,8 +14,8 @@ export enum SearchState {
 }
 
 export enum SearchBoxState {
-    Focused,
     Blurred,
+    Focused,
 }
 
 export interface AnimationStoreState {

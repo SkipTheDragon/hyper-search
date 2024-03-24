@@ -51,6 +51,7 @@ export default function Search() {
             stars.animate();
         }
 
+        console.log(animationStore.states)
         // If the search stopped, stop the animation.
         if (animationStore.states.search === SearchState.Finished) {
             // Add a delay so the animation doesn't end too fast.
@@ -59,16 +60,6 @@ export default function Search() {
             }, 5000);
         }
     }, [animationStore.states.search, canvasRef, reducedMotion]);
-
-
-    // Send the search query to the WebSocket server
-
-
-    useEffect(() => {
-            setTimeout(() => {
-                animationStore.animation.finish()
-            }, 5000)
-    }, [websocketStore.states.mappedResults.SEARCH_QUERY]);
 
     return (
         <>

@@ -1,9 +1,10 @@
 import {Badge, GridItem, Heading, Icon, Text, useColorModeValue, chakra, Spinner} from "@chakra-ui/react";
 import {IoRadioSharp} from "react-icons/io5";
 import React, {useContext, useEffect} from "react";
-import { WebSocketContext} from "../stores/websocketStore";
+import {WebSocketContext} from "../stores/websocketStore";
 import {SuggestionPayload} from "../types/ws/messages/payloads/SuggestionPayload";
 import {MessageTypes} from "../types/ws/messages/MessageTypes";
+import {useSearchStore} from "../stores/searchStore";
 
 export default function NotFound(
     {
@@ -19,7 +20,9 @@ export default function NotFound(
     const iconColor = useColorModeValue('gray.200', 'gray.500');
     const iconColors = useColorModeValue('gray.700', 'navy.100');
 
+    const searchStore = useSearchStore();
     const websocketStore = useContext(WebSocketContext).getState();
+
     const [loading, setLoading] = React.useState<boolean>(true);
 
     useEffect(
@@ -37,13 +40,22 @@ export default function NotFound(
     );
 
     const rawSuggestions = websocketStore.states.mappedResults.SUGGESTION_QUERY?.suggestions;
+
     const suggestions = Object.keys(rawSuggestions || {});
 
+    /**
+     * Hide the loading spinner when the suggestions are loaded.
+     */
     useEffect(() => {
         if (websocketStore.states.mappedResults.SUGGESTION_QUERY?.suggestions !== undefined) {
             setLoading(false)
         }
     }, [websocketStore.states.mappedResults.SUGGESTION_QUERY?.suggestions]);
+
+    const selectSuggestion = (suggestion :string ) => {
+        searchStore.actions.search(suggestion);
+        setCurrentLocation(null)
+    }
 
     return <GridItem
         w='100%'
@@ -99,15 +111,7 @@ export default function NotFound(
                                                 key={index}
                                                 _hover={{cursor: 'pointer'}}
                                                 colorScheme="gray"
-                                                onClick={() => {
-                                                    websocketStore.actions.sendMessage({
-                                                        type: MessageTypes.SearchQuery,
-                                                        payload: {
-                                                            term: suggestion
-                                                        }
-                                                    })
-                                                    setCurrentLocation(null)
-                                                }}
+                                                onClick={() => selectSuggestion(suggestion)}
                                                 ml={2}
                                             >
                                                 {suggestion}

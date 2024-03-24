@@ -1,6 +1,7 @@
 import React, {ReactNode, useEffect, useRef, useState} from "react";
 import {createWebsocketStore, WebSocketContext, WebsocketState} from "../stores/websocketStore";
 import {Alert, AlertTitle, Button, useToast, chakra} from "@chakra-ui/react";
+import {useAnimationStore} from "../stores/animationStore";
 
 
 export default function WebSocketContextProvider({children}: { children: ReactNode }) {
@@ -15,9 +16,14 @@ export default function WebSocketContextProvider({children}: { children: ReactNo
     const toast = useToast();
 
     const store = storeRef.current.getState();
+    const animationStore = useAnimationStore();
 
-    storeRef.current.subscribe(listener => {
-        setState(listener.states.state)
+    storeRef.current.subscribe((currentStore, prevStore) => {
+        setState(currentStore.states.state)
+
+        if (currentStore.states.pastResults.length !== prevStore.states.pastResults.length) {
+            animationStore.search.finish()
+        }
     })
 
     useEffect(() => {

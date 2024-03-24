@@ -17,6 +17,7 @@ import {WebSocketContext} from "../stores/websocketStore";
 import {useDebounce} from "use-debounce";
 import {SearchPayload} from "../types/ws/messages/payloads/SearchPayload";
 import {MessageTypes} from "../types/ws/messages/MessageTypes";
+import {useSearchStore} from "../stores/searchStore";
 
 export interface SearchBarProps {
     tr: any;
@@ -42,13 +43,13 @@ const SearchBar: React.FC<SearchBarProps> = (
 
     const animationStore = useAnimationStore();
     const websocketStore = useContext(WebSocketContext).getState();
+    const searchStore = useSearchStore();
 
     const isMac = navigator.userAgent.includes('Mac') // true
 
     const returnRandomMessage = useCallback(randomMessage, []);
 
-    const [reactiveValue, setReactiveValue] = React.useState("")
-    const [value] = useDebounce(reactiveValue, 1000);
+    const [value] = useDebounce(searchStore.states.search, 1000);
 
     useEffect(() => {
         if (value.length < 1) return;
@@ -84,8 +85,8 @@ const SearchBar: React.FC<SearchBarProps> = (
             <Input
                 onBlur={() => animationStore.searchBox.blur()}
                 onFocus={() => animationStore.searchBox.focus()}
-                onChange={(e) => setReactiveValue(e.target.value)}
-                value={reactiveValue}
+                onChange={(e) => searchStore.actions.search(e.target.value)}
+                value={searchStore.states.search}
                 color={searchTextColor}
                 borderBottomRadius={animationStore.states.animation === AnimationState.Finished ? '0' : 'md'}
                 bg={searchBg}
