@@ -27,8 +27,8 @@ export default function Bar(props: any) {
                 alignItems={'center'}
             >
                 <Kbd mr={2}>TAB</Kbd> <span>to navigate</span>
+                <Kbd ml={4} mr={2}>SHIFT</Kbd> + <Kbd mr={2}>TAB</Kbd> <span>to navigate backwards</span>
                 <Kbd ml={4} mr={2}>ENTER</Kbd> <span>to select</span>
-                <Kbd ml={4} mr={2}>ESC</Kbd> <span>to close</span>
             </Flex>
 
             <Flex

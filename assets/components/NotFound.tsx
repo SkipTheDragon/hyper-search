@@ -1,6 +1,6 @@
 import {Badge, GridItem, Heading, Icon, Text, useColorModeValue, chakra, Spinner} from "@chakra-ui/react";
 import {IoRadioSharp} from "react-icons/io5";
-import React, {useContext, useEffect} from "react";
+import React, {startTransition, useContext, useEffect} from "react";
 import {WebSocketContext} from "../stores/websocketStore";
 import {SuggestionPayload} from "../types/ws/messages/payloads/SuggestionPayload";
 import {MessageTypes} from "../types/ws/messages/MessageTypes";
@@ -27,14 +27,16 @@ export default function NotFound(
 
     useEffect(
         () => {
-            setLoading(true);
-
+            startTransition(() => {
+                setLoading(true);
+            });
             websocketStore.actions.sendMessage<SuggestionPayload>({
                 type: MessageTypes.SuggestionsQuery,
                 payload: {
                     term: websocketStore.states.mappedMessages.SEARCH_QUERY?.term || ''
                 }
             });
+
         },
         [websocketStore.states.mappedResults.SEARCH_QUERY]
     );
@@ -48,7 +50,9 @@ export default function NotFound(
      */
     useEffect(() => {
         if (websocketStore.states.mappedResults.SUGGESTION_QUERY?.suggestions !== undefined) {
-            setLoading(false)
+            startTransition(() => {
+                setLoading(false)
+            });
         }
     }, [websocketStore.states.mappedResults.SUGGESTION_QUERY?.suggestions]);
 

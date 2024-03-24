@@ -9,7 +9,7 @@ import {
     useColorModeValue
 } from "@chakra-ui/react";
 import {SearchIcon} from "@chakra-ui/icons";
-import React, {MutableRefObject, useCallback, useContext, useEffect, useRef} from "react";
+import React, {MutableRefObject, startTransition, useCallback, useContext, useEffect, useRef} from "react";
 import {AnimationState, SearchBoxState, useAnimationStore} from "../stores/animationStore";
 import hotkeyPress from "../functions/hotkeyPress";
 import randomMessage from "../functions/randomMessage";
@@ -29,12 +29,14 @@ const SearchBar: React.FC<SearchBarProps> = (
     }) => {
 
     const searchBoxRef = useRef(null)
+
     function useKey(key: string, ref: MutableRefObject<HTMLInputElement | null>) {
         useEffect(() => {
             document.addEventListener('keydown', (e) => hotkeyPress(key, ref, e));
             return () => document.removeEventListener('keydown', (e) => hotkeyPress(key, ref, e));
         }, [key]);
     }
+
     useKey('k', searchBoxRef);
 
     const searchBg = useColorModeValue('gray.50', 'navy.700');
@@ -53,11 +55,13 @@ const SearchBar: React.FC<SearchBarProps> = (
 
     useEffect(() => {
         if (value.length === 0) {
-            animationStore.search.reset();
-            animationStore.animation.reset();
+            startTransition(() => {
+                animationStore.search.reset();
+                animationStore.animation.reset();
+            });
+
             return;
         }
-
         websocketStore.actions.sendMessage<SearchPayload>({
             type: MessageTypes.SearchQuery,
             payload: {
@@ -65,7 +69,9 @@ const SearchBar: React.FC<SearchBarProps> = (
             }
         });
 
-        animationStore.search.start();
+        startTransition(() => {
+            animationStore.search.start();
+        });
 
     }, [value]);
 

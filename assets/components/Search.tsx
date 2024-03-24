@@ -12,17 +12,15 @@ import {
     usePrefersReducedMotion, useToast,
 } from '@chakra-ui/react';
 import theme from "../theme/theme";
-import React, {useContext, useEffect, useRef} from "react";
+import React, {useContext, useEffect, useRef, startTransition} from "react";
 import SearchBar from "../components/SearchBar";
 import Result from "../components/Result";
 import Header from "../components/Header";
 import StarsScene from "../functions/animations/stars/StarsScene";
 import {AnimationState, SearchBoxState, SearchState, useAnimationStore} from "../stores/animationStore";
-import {createWebsocketStore, WebSocketContext, WebsocketState} from "../stores/websocketStore";
 
 export default function Search() {
     const reducedMotion = usePrefersReducedMotion();
-    const websocketStore = useContext(WebSocketContext).getState();
     const animationStore = useAnimationStore();
     const canvasRef = useRef(null)
 
@@ -45,19 +43,24 @@ export default function Search() {
 
         const stars = new StarsScene(canvasRef.current);
 
-        // If the user is searching, animate the background.
-        if (animationStore.states.search === SearchState.Searching) {
-            animationStore.animation.start();
-            stars.animate();
-        }
+        startTransition(() => {
+            // If the user is searching, animate the background.
+            if (animationStore.states.search === SearchState.Searching) {
+                animationStore.animation.start();
+                stars.animate();
+            }
+        });
 
-        // If the search stopped, stop the animation.
-        if (animationStore.states.search === SearchState.Finished) {
-            // Add a delay so the animation doesn't end too fast.
-            setTimeout(() => {
-                animationStore.animation.finish();
-            }, 5000);
-        }
+            // If the search stopped, stop the animation.
+            if (animationStore.states.search === SearchState.Finished) {
+                // Add a delay so the animation doesn't end too fast.
+                setTimeout(() => {
+                    startTransition(() => {
+                        animationStore.animation.finish();
+                    });
+                }, 5000);
+            }
+
     }, [animationStore.states.search, canvasRef, reducedMotion]);
 
     return (
