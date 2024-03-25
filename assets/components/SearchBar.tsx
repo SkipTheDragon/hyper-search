@@ -9,7 +9,7 @@ import {
     useColorModeValue
 } from "@chakra-ui/react";
 import {SearchIcon} from "@chakra-ui/icons";
-import React, {MutableRefObject, startTransition, useCallback, useContext, useEffect, useRef} from "react";
+import React, {MutableRefObject, startTransition, useContext, useEffect, useMemo, useRef} from "react";
 import {AnimationState, SearchBoxState, useAnimationStore} from "../stores/animationStore";
 import hotkeyPress from "../functions/hotkeyPress";
 import randomMessage from "../functions/randomMessage";
@@ -49,7 +49,7 @@ const SearchBar: React.FC<SearchBarProps> = (
 
     const isMac = navigator.userAgent.includes('Mac') // true
 
-    const returnRandomMessage = useCallback(randomMessage, []);
+    const returnRandomMessage = useMemo(() => randomMessage(), []);
 
     const [value] = useDebounce(searchStore.states.search, 1000);
 
@@ -104,7 +104,7 @@ const SearchBar: React.FC<SearchBarProps> = (
                 id="hyper-search"
                 fontSize={"1rem"}
                 size="lg"
-                placeholder={returnRandomMessage()}
+                placeholder={returnRandomMessage}
             />
             {
                 <InputRightElement pointerEvents='none'

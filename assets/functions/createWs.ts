@@ -9,7 +9,7 @@ import {createStore} from "zustand";
 export default function createWs(store: any|ReturnType<typeof createStore<WebsocketStoreState>>) {
     const mStore = store.getState();
 
-    const socket = new WebSocket(window["config"].app.websocket)
+    const socket = new WebSocket(window.config.app.websocket)
 
     mStore._internals._setSocketStatus(mapWsStateToStoreState(socket.readyState));
     socket.onclose = () => mStore._internals._setSocketStatus(mapWsStateToStoreState(socket.readyState));

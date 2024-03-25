@@ -10,4 +10,10 @@ import './bootstrap';
 // any CSS you import will output into a single css file (app.css in this case)
 import './styles/app.css';
 
-registerReactControllerComponents(require.context('./pages', true, /\.(j|t)sx?$/));
+if (window.config !== undefined) {
+    registerReactControllerComponents(require.context('./pages', true, /\.(j|t)sx?$/));
+} else {
+    console.error("Config not found. Make sure to include the config in the base.html.twig file.")
+    document.body.innerHTML = "<h1>Config is not found. Make sure to include the config in the base.html.twig file.</h1>"
+}
+

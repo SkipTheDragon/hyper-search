@@ -79,7 +79,6 @@ export const createWebsocketStore = () => {
                     store.states.socket.send(JSON.stringify(message))
 
                     return {
-                        ...store,
                         states: {
                             ...store.states,
                             mappedMessages: {
@@ -97,8 +96,7 @@ export const createWebsocketStore = () => {
                 saveResult:
                     (result) => set((store) => (
                         {
-                            ...store,
-                            states: {
+                                states: {
                                 ...store.states,
                                 mappedResults: {
                                     ...store.states.mappedResults,
@@ -116,7 +114,6 @@ export const createWebsocketStore = () => {
                  */
                 _setSocketStatus: (state: WebsocketState) => set((store) => (
                     {
-                        ...store,
                         states: {
                             ...store.states,
                             state: state
