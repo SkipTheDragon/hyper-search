@@ -15,7 +15,7 @@ class SearchService
 
     public function __construct(
         protected ParameterBagInterface $parameterBag,
-        protected string $index = 'links'
+        protected string                $index = 'links'
     )
     {
         $manticoreConfig = $this->parameterBag->get('manticore');
@@ -26,24 +26,24 @@ class SearchService
     /**
      * @throws Exception
      */
-    public function search($keyword) : mixed
+    public function search($keyword): mixed
     {
         $search = new Search($this->client);
         $search->setIndex($this->index);
 
         $q = new BoolQuery();
-        $q->must(new MatchQuery(['query' => $keyword . '~ 10', 'operator' => 'or'], '*'));
+        $q->must(new MatchQuery(['query' =>  "*$keyword*", 'operator' => 'or'], '*'));
         $response = $search->search($q)->get();
 
         return $response->getResponse()->getResponse();
     }
 
-    public function suggest(string $keyword, int $limit = 5) : array
+    public function suggest(string $keyword, int $limit = 5): array
     {
         $params = [
             'index' => $this->index,
             'body' => [
-                'query' => $keyword . '~ 10',
+                'query' =>  "*$keyword*",
                 'options' => [
                     'limit' => $limit
                 ],
@@ -53,14 +53,15 @@ class SearchService
         return $this->client->suggest($params);
     }
 
-    public function autocomplete(string $keyword, int $limit = 5) : array
+    public function autocomplete(string $keyword, int $limit = 5): array
     {
         $params = [
             'index' => $this->index,
             'body' => [
-                'query' => $keyword . '~ 10',
+                'query' =>  "^$keyword*",
                 'options' => [
-                    'limit' => $limit
+                    'stats' => 1,
+                    'fold_lemmas' => 1,
                 ],
             ]
         ];

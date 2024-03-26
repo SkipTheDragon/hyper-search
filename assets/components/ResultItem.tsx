@@ -23,8 +23,13 @@ const Result: React.FC<SearchResultItem['_source']> = (
             display={'flex'}
             justifyContent={'space-between'}
             alignItems={'center'}
+            role="group"
         >
-            <chakra.div
+            <chakra.a
+                target={'_blank'}
+                href={link}
+                transition={'all 0.3s ease-in-out'}
+                _groupHover={{ marginLeft: "10px" }}
                 display={'flex'}
                 flexDirection={'column'}
                 justifyContent={'flex-start'}
@@ -32,7 +37,9 @@ const Result: React.FC<SearchResultItem['_source']> = (
             >
                 <Heading
                     as={'h4'}
+                    transition={'all 0.3s ease-in-out'}
                     size={'md'}
+                    _groupHover={{ color: "brand.400" }}
                     color={heading}
                     marginBottom={'0.5rem'}
                 >
@@ -46,7 +53,7 @@ const Result: React.FC<SearchResultItem['_source']> = (
                 <Text color={'gray.500'}>
                     In: <b>{location}</b>
                 </Text>
-            </chakra.div>
+            </chakra.a>
             <Button as={'a'} target={'_blank'} href={link}>
                 <Icon as={FaArrowRight} />
             </Button>

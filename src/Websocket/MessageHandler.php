@@ -2,6 +2,7 @@
 
 namespace App\Websocket;
 
+use App\Message\AutocompleteMessage;
 use App\Message\SearchMessage;
 use App\Message\SuggestionMessage;
 use App\Service\SearchService;
@@ -24,7 +25,8 @@ class MessageHandler implements MessageComponentInterface
 
     protected const MESSAGE_TYPES = [
         SearchMessage::class,
-        SuggestionMessage::class
+        SuggestionMessage::class,
+        AutocompleteMessage::class
     ];
 
     public function __construct(

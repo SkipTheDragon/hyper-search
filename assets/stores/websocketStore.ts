@@ -54,17 +54,17 @@ export const createWebsocketStore = () => {
                 mappedMessages: {}
             },
             actions: {
-                reconnect: () => set((store) => {
-                    store._internals._setSocketStatus(WebsocketState.Connecting)
-
+                reconnect: () => set((_store) => {
                     setTimeout(() => {
-                        set((store) => {
-                            createWs(store)
-                            return store
-                        });
+                        createWs(store)
                     }, 3000)
 
-                    return store;
+                    return                  {
+                        states: {
+                            ..._store.states,
+                            state: WebsocketState.Connecting
+                        }
+                    };
                 }),
                 /**
                  * Send a message to the websocket server
