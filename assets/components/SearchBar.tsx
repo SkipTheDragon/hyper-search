@@ -14,12 +14,13 @@ import React, {MutableRefObject, startTransition, useContext, useEffect, useMemo
 import {AnimationState, SearchBoxState, useAnimationStore} from "../stores/animationStore";
 import hotkeyPress from "../functions/hotkeyPress";
 import randomMessage from "../functions/randomMessage";
-import {WebSocketContext} from "../stores/websocketStore";
+import {WebSocketContext, WebsocketState, WebsocketStoreState} from "../stores/websocketStore";
 import {useDebounce} from "use-debounce";
 import {SearchPayload} from "../types/ws/messages/payloads/SearchPayload";
 import {MessageTypes} from "../types/ws/messages/MessageTypes";
 import {useSearchStore} from "../stores/searchStore";
 import {AutocompletePayload} from "../types/ws/messages/payloads/AutocompletePayload";
+import {useWebsocketStore} from "../context/WebSocketContextProvider";
 
 export interface SearchBarProps {
     tr: any;
@@ -46,7 +47,7 @@ const SearchBar: React.FC<SearchBarProps> = (
     const iconColors = useColorModeValue('gray.700', 'navy.100');
 
     const animationStore = useAnimationStore();
-    const websocketStore = useContext(WebSocketContext).getState();
+    const websocketStore = useWebsocketStore((store : WebsocketStoreState)=> store);
     const searchStore = useSearchStore();
 
     const isMac = navigator.userAgent.includes('Mac') // true
@@ -202,6 +203,7 @@ const SearchBar: React.FC<SearchBarProps> = (
                     borderBottomRadius={animationStore.states.animation === AnimationState.Finished ? '0' : 'md'}
                     bg={searchBg}
                     ref={searchBoxRef}
+                    disabled={websocketStore.states.state !== WebsocketState.Connected}
                     autoComplete="off"
                     id="hyper-search"
                     fontSize={"1rem"}

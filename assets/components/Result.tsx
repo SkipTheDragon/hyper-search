@@ -14,7 +14,8 @@ import NotFound from "./NotFound";
 import Bar from "./Bar";
 import ResultItem from "./ResultItem";
 import {AnimationState, useAnimationStore} from "../stores/animationStore";
-import {WebSocketContext} from "../stores/websocketStore";
+import {WebSocketContext, WebsocketStoreState} from "../stores/websocketStore";
+import {useWebsocketStore} from "../context/WebSocketContextProvider";
 
 const Result = () => {
     const buttonData: {
@@ -38,7 +39,7 @@ const Result = () => {
     const [currentLocation, setCurrentLocation] = React.useState<string | null>(null);
 
     const animationStore = useAnimationStore();
-    const websocketStore = useContext(WebSocketContext).getState();
+    const websocketStore = useWebsocketStore((store : WebsocketStoreState ) => store);
 
     const lastSearchQueryData = websocketStore.states.mappedResults?.SEARCH_QUERY?.data;
 

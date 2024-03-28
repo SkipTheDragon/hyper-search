@@ -1,5 +1,5 @@
 import mapWsStateToStoreState from "./mapWsStateToStoreState";
-import { WebsocketStoreState} from "../stores/websocketStore";
+import {WebsocketState, WebsocketStoreState} from "../stores/websocketStore";
 import {createStore} from "zustand";
 
 /**
@@ -11,18 +11,15 @@ export default function createWs(store: any|ReturnType<typeof createStore<Websoc
 
     const socket = new WebSocket(window.config.app.websocket)
 
-    mStore._internals._setSocketStatus(mapWsStateToStoreState(socket.readyState));
     socket.onclose = () => mStore._internals._setSocketStatus(mapWsStateToStoreState(socket.readyState));
     socket.onopen = () => mStore._internals._setSocketStatus(mapWsStateToStoreState(socket.readyState));
     socket.onerror = () => mStore._internals._setSocketStatus(mapWsStateToStoreState(socket.readyState));
-
     socket.onmessage = (event) => {
         mStore.actions.saveResult(JSON.parse(event.data))
     };
 
     store.setState(
         {
-            ...mStore,
             states: {
                 ...mStore.states,
                 socket: socket

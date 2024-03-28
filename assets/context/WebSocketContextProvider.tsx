@@ -1,7 +1,9 @@
-import React, {ReactNode, useEffect, useRef, useState} from "react";
-import {createWebsocketStore, WebSocketContext, WebsocketState} from "../stores/websocketStore";
+import React, {ReactNode, useContext, useEffect, useRef, useState} from "react";
+import {createWebsocketStore, WebSocketContext, WebsocketState, WebsocketStoreState} from "../stores/websocketStore";
 import {Alert, AlertTitle, Button, useToast, chakra} from "@chakra-ui/react";
 import {useAnimationStore} from "../stores/animationStore";
+import {StoreApi, useStore} from "zustand";
+import ArgumentsOf = jest.ArgumentsOf;
 
 
 export default function WebSocketContextProvider({children}: { children: ReactNode }) {
@@ -91,8 +93,6 @@ export default function WebSocketContextProvider({children}: { children: ReactNo
                 id: 'websocket-connected'
             });
         }
-
-
     }, [state]);
 
     return (
@@ -100,4 +100,14 @@ export default function WebSocketContextProvider({children}: { children: ReactNo
             {children}
         </WebSocketContext.Provider>
     )
+}
+
+type SelectorType = Parameters<typeof useStore<StoreApi<WebsocketStoreState>, WebsocketStoreState>>[1];
+
+export const useWebsocketStore = (selector: SelectorType) => {
+    const store = useContext(WebSocketContext)
+    if (!store) {
+        throw new Error('Missing WebsocketStoreProvider')
+    }
+    return useStore(store, selector)
 }

@@ -96,7 +96,7 @@ export const createWebsocketStore = () => {
                 saveResult:
                     (result) => set((store) => (
                         {
-                                states: {
+                            states: {
                                 ...store.states,
                                 mappedResults: {
                                     ...store.states.mappedResults,

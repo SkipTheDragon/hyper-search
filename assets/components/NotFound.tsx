@@ -1,10 +1,11 @@
 import {Badge, GridItem, Heading, Icon, Text, useColorModeValue, chakra, Spinner} from "@chakra-ui/react";
 import {IoRadioSharp} from "react-icons/io5";
 import React, {startTransition, useContext, useEffect} from "react";
-import {WebSocketContext} from "../stores/websocketStore";
+import {WebSocketContext, WebsocketStoreState} from "../stores/websocketStore";
 import {SuggestionPayload} from "../types/ws/messages/payloads/SuggestionPayload";
 import {MessageTypes} from "../types/ws/messages/MessageTypes";
 import {useSearchStore} from "../stores/searchStore";
+import {useWebsocketStore} from "../context/WebSocketContextProvider";
 
 export default function NotFound(
     {
@@ -21,7 +22,7 @@ export default function NotFound(
     const iconColors = useColorModeValue('gray.700', 'navy.100');
 
     const searchStore = useSearchStore();
-    const websocketStore = useContext(WebSocketContext).getState();
+    const websocketStore = useWebsocketStore((store: WebsocketStoreState) => store);
 
     const [loading, setLoading] = React.useState<boolean>(true);
 
