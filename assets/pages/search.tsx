@@ -2,10 +2,18 @@ import React, {useEffect, useRef} from "react";
 import WebSocketContextProvider from "../context/WebSocketContextProvider";
 import Search from "../components/Search";
 import SettingsPanel from "../components/SettingsPanel";
-import {ChakraBaseProvider, ColorModeScript} from "@chakra-ui/react";
+import {ChakraBaseProvider, ColorModeScript, usePrefersReducedMotion} from "@chakra-ui/react";
 import theme from "../theme/theme";
+import {useSettingsStore} from "../stores/settingsStore";
 
 export default function SearchPage() {
+    const setReducedMotion = useSettingsStore((s) => s.actions.setReducedMotion);
+    const reducedMotion = usePrefersReducedMotion()
+
+    useEffect(() => {
+        setReducedMotion(reducedMotion)
+    }, [reducedMotion]);
+
     return (
         <>
             <ColorModeScript initialColorMode={theme.config.initialColorMode}/>

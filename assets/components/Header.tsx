@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = (
     }
 ) => {
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore((store: WebsocketStoreState) => store);
+    const websocketStore = useWebsocketStore<WebsocketStoreState>((store: WebsocketStoreState) => store);
 
     const headingColorUnfocused = useColorModeValue(
         'black',

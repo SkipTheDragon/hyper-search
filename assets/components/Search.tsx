@@ -96,7 +96,10 @@ export default function Search() {
                     </Stack>
                 </Fade>
 
-                <SearchHistory/>
+                {
+                    animationStore.states.animation === AnimationState.NotRunning &&
+                    <SearchHistory/>
+                }
             </Container>
             <canvas ref={canvasRef} style={{
                 transition: 'all 0.2s ease-in-out',

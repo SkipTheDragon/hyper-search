@@ -102,9 +102,9 @@ export default function WebSocketContextProvider({children}: { children: ReactNo
     )
 }
 
-type SelectorType = Parameters<typeof useStore<StoreApi<WebsocketStoreState>, WebsocketStoreState>>[1];
+type SelectorType<R> = Parameters<typeof useStore<StoreApi<WebsocketStoreState>, R>>[1];
 
-export const useWebsocketStore = (selector: SelectorType) => {
+export function useWebsocketStore<R>(selector: SelectorType<R>) {
     const store = useContext(WebSocketContext)
     if (!store) {
         throw new Error('Missing WebsocketStoreProvider')

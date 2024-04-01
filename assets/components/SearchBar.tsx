@@ -47,7 +47,7 @@ const SearchBar: React.FC<SearchBarProps> = (
     const iconColors = useColorModeValue('gray.700', 'navy.100');
 
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore((store : WebsocketStoreState)=> store);
+    const websocketStore = useWebsocketStore<WebsocketStoreState>((store : WebsocketStoreState)=> store);
     const searchStore = useSearchStore();
 
     const isMac = navigator.userAgent.includes('Mac') // true

@@ -39,7 +39,7 @@ const Result = () => {
     const [currentLocation, setCurrentLocation] = React.useState<string | null>(null);
 
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore((store : WebsocketStoreState ) => store);
+    const websocketStore = useWebsocketStore<WebsocketStoreState>((store : WebsocketStoreState ) => store);
 
     const lastSearchQueryData = websocketStore.states.mappedResults?.SEARCH_QUERY?.data;
 

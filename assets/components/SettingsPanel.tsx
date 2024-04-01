@@ -7,7 +7,7 @@ import {
     useColorModeValue,
     chakra,
     FormControl,
-    useColorMode, usePrefersReducedMotion, Button
+    useColorMode, usePrefersReducedMotion, Button, FormHelperText
 } from "@chakra-ui/react";
 import {useSettingsStore} from "../stores/settingsStore";
 import {useEffect, useState} from "react";
@@ -62,6 +62,14 @@ export default function () {
                             actions.setReducedMotion(!states.reducedMotion)
                         }} id="reduced-motion-switcher"/>
                 <FormLabel marginLeft={'10px'} htmlFor="reduced-motion-switcher">Toggle reduced motion</FormLabel>
+            </FormControl>
+
+            <FormControl marginTop={'20px'} display="flex">
+                <Switch isChecked={states.fillHistory}
+                        onChange={() => {
+                            actions.setFillHistory(!states.fillHistory)
+                        }} id="fill-history-data"/>
+                <FormLabel marginLeft={'10px'} htmlFor="fill-history-data">Fill search history with demo data.</FormLabel>
             </FormControl>
 
             <FormControl marginTop={'20px'}>

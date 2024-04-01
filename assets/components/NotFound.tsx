@@ -22,7 +22,7 @@ export default function NotFound(
     const iconColors = useColorModeValue('gray.700', 'navy.100');
 
     const searchStore = useSearchStore();
-    const websocketStore = useWebsocketStore((store: WebsocketStoreState) => store);
+    const websocketStore = useWebsocketStore<WebsocketStoreState>((store: WebsocketStoreState) => store);
 
     const [loading, setLoading] = React.useState<boolean>(true);
 

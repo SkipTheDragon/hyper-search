@@ -1,54 +1,68 @@
-import {chakra, Fade, Input, ScaleFade, SlideFade, Stack, useColorModeValue} from "@chakra-ui/react";
+import {chakra, Stack} from "@chakra-ui/react";
 import React, {useEffect, useRef, useState} from "react";
 import SearchHistoryItem from "./SearchHistoryItem";
+import {Message} from "../types/ws/messages/Message";
+import {SearchPayload} from "../types/ws/messages/payloads/SearchPayload";
+import {useWebsocketStore} from "../context/WebSocketContextProvider";
+import {WebsocketStoreState} from "../stores/websocketStore";
+import {MessageTypes} from "../types/ws/messages/MessageTypes";
+import {useSettingsStore} from "../stores/settingsStore";
 
+function checkScrollDirectionIsUp(event: WheelEvent) {
+    if (event.deltaY) {
+        return event.deltaY > 0;
+    }
+    return event.deltaY < 0;
+}
+export const searchHistoryBoxesPerPage = 6;
 
 export default function () {
-    const [visibleHistory, setVisibleHistory] = useState([]);
-    const [lastArrayElementKey, setLastArrayElementKey] = useState(0);
+    const [visibleHistory, setVisibleHistory] = useState<Message<SearchPayload>[]>([]);
+    const [lastArrayElementKey, setLastArrayElementKey] = useState<number>(0);
     const element = useRef<HTMLDivElement | null>(null);
     const [historyChanging, changeHistory] = useState<boolean>(true);
-    const searches = 6;
-
-    function checkScrollDirectionIsUp(event: WheelEvent) {
-        if (event.deltaY) {
-            return event.deltaY > 0;
+    const [fullHistory, setFullHistory] = useState<Message<SearchPayload>[]>([]);
+    const websocketHistory: Message<SearchPayload>[] = useWebsocketStore((store: WebsocketStoreState) => store.states.pastMessages).filter((message) => message.type === MessageTypes.SearchQuery);
+    const fillHistory = useSettingsStore((store) => store.states.fillHistory);
+    useEffect(() => {
+        if (fillHistory) {
+            setFullHistory(new Array(100).fill(0, 0, 100).map((e, i) => {
+                return {
+                    "id": i,
+                    "type": "SEARCH_QUERY",
+                    "payload": {
+                        "term": "test " + i
+                    }
+                } as Message<SearchPayload>
+            }))
+        } else {
+            setFullHistory(websocketHistory)
         }
-        return event.deltaY < 0;
-    }
 
-    const fullHistory = new Array(100).fill(0, 0, 100).map((e, i) => {
-        return {
-            "id": i,
-            "type": "SEARCH_QUERY",
-            "payload": {
-                "term": "test " + i
-            }
-        }
-    });
+    }, [fillHistory]);
 
     // Natural scroll for macos
     function scrollItems(event: WheelEvent) {
         const arrayTmp = fullHistory;
         let direction = 1;
         let end = lastArrayElementKey + direction;
-        let start = lastArrayElementKey - ((searches - 1) * direction);
+        let start = lastArrayElementKey - ((searchHistoryBoxesPerPage - 1) * direction);
 
         // On scroll down add to visibleHistory and remove last element
         if (!checkScrollDirectionIsUp(event)) {
             direction = -1;
             end = lastArrayElementKey + direction;
-            start = lastArrayElementKey + ((searches + 1) * direction);
+            start = lastArrayElementKey + ((searchHistoryBoxesPerPage + 1) * direction);
         }
 
         changeHistory(false);
 
         setTimeout(() => {
             if (start < 0) {
-                setVisibleHistory(arrayTmp.slice(0, searches));
-                setLastArrayElementKey(searches);
+                setVisibleHistory(arrayTmp.slice(0, searchHistoryBoxesPerPage));
+                setLastArrayElementKey(searchHistoryBoxesPerPage);
             } else if (end > arrayTmp.length) {
-                setVisibleHistory(arrayTmp.slice(arrayTmp.length - searches, arrayTmp.length));
+                setVisibleHistory(arrayTmp.slice(arrayTmp.length - searchHistoryBoxesPerPage, arrayTmp.length));
                 setLastArrayElementKey(arrayTmp.length);
             } else {
                 setVisibleHistory(arrayTmp.slice(start, end));
@@ -72,17 +86,17 @@ export default function () {
 
 
     useEffect(() => {
-        const start = fullHistory.length - searches;
+        const start = fullHistory.length - searchHistoryBoxesPerPage;
         // Get the last 6 items from the history
         setVisibleHistory(fullHistory.slice(start, fullHistory.length));
         setLastArrayElementKey(fullHistory.length);
-    }, []);
+    }, [fullHistory]);
 
     return (
         <Stack
             ref={element}
             textAlign="center"
-            py={{base: 20, md: 36}}
+            py={{base: 16, md: 18}}
         >
             {
                 visibleHistory && visibleHistory.map((historyItem, key) =>
@@ -91,24 +105,9 @@ export default function () {
                         sizeKey={key}
                         historyChanging={historyChanging}
                         historyItem={historyItem}
-                        searches={searches}
                     />
                 )
             }
-            <chakra.h4
-                color={'gray.400'}
-                fontSize={"0.9rem"}
-                fontWeight={'bold'}
-                borderBottom={'1px solid'}
-                width={'30%'}
-                textAlign="center"
-                margin={'auto'}
-                cursor={'pointer'}
-                paddingBottom={'10px'}
-                borderColor={'gray.200'}
-            >
-                Scroll Down/Up to see more
-            </chakra.h4>
         </Stack>
     )
 }

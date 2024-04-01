@@ -18,7 +18,7 @@ export enum WebsocketState {
 export interface WebsocketStoreState {
     states: {
         state: WebsocketState,
-        socket: WebSocket|null,
+        socket: WebSocket | null,
         pastMessages: Message<any>[],
         pastResults: Results[],
         mappedResults: Partial<{
@@ -43,7 +43,7 @@ export interface WebsocketStoreState {
  */
 export const createWebsocketStore = () => {
 
-    const store =  createStore<WebsocketStoreState>()(
+    const store = createStore<WebsocketStoreState>()(
         subscribeWithSelector((set, get) => ({
             states: {
                 state: WebsocketState.Uninitialized,
@@ -59,7 +59,7 @@ export const createWebsocketStore = () => {
                         createWs(store)
                     }, 3000)
 
-                    return                  {
+                    return {
                         states: {
                             ..._store.states,
                             state: WebsocketState.Connecting
@@ -85,7 +85,10 @@ export const createWebsocketStore = () => {
                                 ...store.states.mappedMessages,
                                 [message.type]: message.payload
                             },
-                            pastMessages: [...store.states.pastMessages, message],
+                            pastMessages: [...store.states.pastMessages, {
+                                id: store.states.pastMessages.length,
+                                ...message
+                            }],
                         }
                     };
                 }),
@@ -102,7 +105,10 @@ export const createWebsocketStore = () => {
                                     ...store.states.mappedResults,
                                     [result.type]: result
                                 },
-                                pastResults: [...store.states.pastResults, result],
+                                pastResults: [...store.states.pastResults, {
+                                    id: store.states.pastResults.length,
+                                    ...result
+                                }],
                             }
                         }
                     )),

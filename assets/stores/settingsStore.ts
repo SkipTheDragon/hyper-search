@@ -7,12 +7,14 @@ import {createWebsocketStore} from "./websocketStore";
 export interface SettingsStoreState {
     states: {
         reducedMotion: boolean,
+        fillHistory: boolean,
         synced: boolean,
         animationDelay: number,
     },
     actions: {
         setAnimationDelay: (animationDelay: number) => void
         setReducedMotion: (isReducedMotion: boolean) => void
+        setFillHistory: (fillHistory: boolean) => void
         setSynced: () => void
     }
 }
@@ -25,6 +27,7 @@ export const useSettingsStore =  create<SettingsStoreState>()(
             states: {
                 synced: false, // Whether the store has been synced with the user's preferences.
                 reducedMotion: false,
+                fillHistory: false,
                 animationDelay: 5000
             },
             actions: {
@@ -32,6 +35,12 @@ export const useSettingsStore =  create<SettingsStoreState>()(
                     states: {
                         ...store.states,
                         animationDelay
+                    }
+                })),
+                setFillHistory: (fillHistory: boolean) => set(store => ({
+                    states: {
+                        ...store.states,
+                        fillHistory
                     }
                 })),
                 setReducedMotion: (isReducedMotion) => set(store => ({
