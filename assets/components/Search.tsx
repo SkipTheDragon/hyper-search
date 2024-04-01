@@ -1,30 +1,24 @@
-import {
-    Alert,
-    AlertTitle,
-    Button,
-    ChakraBaseProvider,
-    ColorModeScript,
-    Container,
-    Fade,
-    Flex,
-    Stack,
-    Text, ToastId,
-} from '@chakra-ui/react';
-import theme from "../theme/theme";
-import React, {useContext, useEffect, useRef, startTransition} from "react";
+import {Container, Fade, Flex, Stack, Text,} from '@chakra-ui/react';
+import React, {startTransition, useEffect, useRef} from "react";
 import SearchBar from "../components/SearchBar";
 import Result from "../components/Result";
 import Header from "../components/Header";
 import StarsScene from "../functions/animations/stars/StarsScene";
-import {AnimationState, SearchBoxState, SearchState, useAnimationStore} from "../stores/animationStore";
+import {
+    AnimationState,
+    SearchBoxState,
+    SearchHistoryState,
+    SearchState,
+    useAnimationStore
+} from "../stores/animationStore";
 import {useSettingsStore} from "../stores/settingsStore";
+import SearchHistory from "./SearchHistory";
 
 export default function Search() {
-
     const settingsStore = useSettingsStore();
     const animationStore = useAnimationStore();
-    const canvasRef = useRef(null)
 
+    const canvasRef = useRef(null)
     const tr = {
         transitionProperty: "var(--chakra-transition-property-common)",
         transitionDuration: "var(--chakra-transition-duration-normal)"
@@ -33,8 +27,6 @@ export default function Search() {
     // Add searching animation to the background
     useEffect(() => {
         // If the user has requested reduced motion, don't animate.
-
-
         document.body.style.transition = 'background-color 0.2s ease-in-out';
 
         if (canvasRef.current === null) {
@@ -60,7 +52,9 @@ export default function Search() {
             // Add a delay so the animation doesn't end too fast.
             setTimeout(() => {
                 startTransition(() => {
-                    animationStore.animation.finish();
+                    if (animationStore.states.animation === AnimationState.Finished) {
+                        animationStore.animation.finish();
+                    }
                 });
             }, settingsStore.states.animationDelay);
         }
@@ -70,31 +64,39 @@ export default function Search() {
     return (
         <>
             <Container maxW={'5xl'}>
-                <Stack
-                    transition={'margin-top 0.2s ease-in-out'}
-                    marginTop={animationStore.states.animation === AnimationState.Finished ? '0' : '20vh'}
-                    textAlign="center"
-                    spacing={{base: 8, md: 14}}
-                    py={{base: 20, md: 36}}>
-                    <Header tr={tr}/>
-                    <Container
-                        transition={'max-width 0.2s ease-in-out'}
-                        maxW={animationStore.states.searchBox === SearchBoxState.Focused || animationStore.states.search !== SearchState.Waiting ? '4xl' : '2xl'}>
-                        <Flex direction={'column'}>
-                            <SearchBar tr={tr}/>
-                            <Result/>
-                        </Flex>
-                    </Container>
-                    <Fade
-                        in={animationStore.states.search === SearchState.Waiting}>
-                        <Text color={'gray.500'} width="75%" margin="auto">
-                            Query enables fast searches across our documentations, knowledge bases, tickets, and
-                            forums. Instantly access relevant information with an efficient interface, making it
-                            easy to
-                            find answers, solutions, and discussions in one place.
-                        </Text>
-                    </Fade>
-                </Stack>
+                <Fade
+                    in={animationStore.states.searchHistory === SearchHistoryState.NotActive}
+                    unmountOnExit={true}
+                >
+                    <Stack
+                        transition={'margin-top 0.2s ease-in-out'}
+                        marginTop={animationStore.states.animation === AnimationState.Finished ? '0' : '20vh'}
+                        textAlign="center"
+                        spacing={{base: 8, md: 14}}
+                        py={{base: 20, md: 36}}
+                    >
+                        <Header tr={tr}/>
+                        <Container
+                            transition={'max-width 0.2s ease-in-out'}
+                            maxW={animationStore.states.searchBox === SearchBoxState.Focused || animationStore.states.search !== SearchState.Waiting ? '4xl' : '2xl'}>
+                            <Flex direction={'column'}>
+                                <SearchBar tr={tr}/>
+                                <Result/>
+                            </Flex>
+                        </Container>
+                        <Fade
+                            in={animationStore.states.search === SearchState.Waiting}>
+                            <Text color={'gray.500'} width="75%" margin="auto">
+                                Query enables fast searches across our documentations, knowledge bases, tickets, and
+                                forums. Instantly access relevant information with an efficient interface, making it
+                                easy to
+                                find answers, solutions, and discussions in one place.
+                            </Text>
+                        </Fade>
+                    </Stack>
+                </Fade>
+
+                <SearchHistory/>
             </Container>
             <canvas ref={canvasRef} style={{
                 transition: 'all 0.2s ease-in-out',

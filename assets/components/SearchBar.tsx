@@ -60,13 +60,13 @@ const SearchBar: React.FC<SearchBarProps> = (
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
 
-        if (urlParams.has('q')) {
+        if (urlParams.has('q') && websocketStore.states.state === WebsocketState.Connected) {
             const searchQuery = urlParams.get('q');
             if (searchQuery) {
                 searchStore.actions.search(searchQuery);
             }
         }
-    }, []);
+    }, [websocketStore.states.state]);
 
     useKey('k', searchBoxRef);
 

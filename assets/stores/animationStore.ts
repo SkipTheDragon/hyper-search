@@ -18,12 +18,22 @@ export enum SearchBoxState {
     Focused,
 }
 
+export enum SearchHistoryState {
+    NotActive,
+    Active,
+}
+
 export interface AnimationStoreState {
     states: {
         search: SearchState,
         animation: AnimationState,
-        searchBox: SearchBoxState
+        searchBox: SearchBoxState,
+        searchHistory: SearchHistoryState,
     },
+    searchHistory: {
+        activate: () => void
+        deactivate: () => void
+    }
     search: {
         start: () => void
         finish: () => void
@@ -50,6 +60,21 @@ export const useAnimationStore = create<AnimationStoreState>()(
             search: SearchState.Waiting,
             animation: AnimationState.NotRunning,
             searchBox: SearchBoxState.Blurred,
+            searchHistory: SearchHistoryState.NotActive,
+        },
+        searchHistory: {
+            activate: () => set((store) => ({
+                states: {
+                    ...store.states,
+                    searchHistory: SearchHistoryState.Active,
+                }
+            })),
+            deactivate: () => set((store) => ({
+                states: {
+                    ...store.states,
+                    searchHistory: SearchHistoryState.NotActive,
+                }
+            })),
         },
         search: {
             start: () => set((store) => ({
