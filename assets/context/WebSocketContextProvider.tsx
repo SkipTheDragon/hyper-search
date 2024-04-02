@@ -39,10 +39,14 @@ export default function WebSocketContextProvider({children}: { children: ReactNo
                 <Alert status="error" borderRadius={'5rem'} top={'5rem'}>
                     <AlertTitle>
                         <chakra.span marginRight={"1rem"}>❌️</chakra.span>
-                        The connection to our server has been lost! </AlertTitle>
+                        The connection to our server has been lost!
+                    </AlertTitle>
                     <Button onClick={() => store.actions.reconnect()}> Reconnect </Button>
                 </Alert>
             );
+
+            animationStore.search.reset()
+            animationStore.animation.reset()
 
             toast({
                 duration: time,
@@ -60,7 +64,8 @@ export default function WebSocketContextProvider({children}: { children: ReactNo
                 <Alert status="info" borderRadius={'5rem'} top={'5rem'}>
                     <AlertTitle>
                         <chakra.span marginRight={"1rem"}>⏱️</chakra.span>
-                        Connecting to our server... </AlertTitle>
+                        Connecting to our server...
+                    </AlertTitle>
                 </Alert>
             );
 
@@ -80,7 +85,8 @@ export default function WebSocketContextProvider({children}: { children: ReactNo
                 <Alert status="success" borderRadius={'5rem'} top={'5rem'}>
                     <AlertTitle>
                         <chakra.span marginRight={"1rem"}>✅</chakra.span>
-                        Connection to server established! </AlertTitle>
+                        Connection to server established!
+                    </AlertTitle>
                 </Alert>
             );
 
@@ -104,7 +110,7 @@ export default function WebSocketContextProvider({children}: { children: ReactNo
 
 type SelectorType<R> = Parameters<typeof useStore<StoreApi<WebsocketStoreState>, R>>[1];
 
-export function useWebsocketStore<R>(selector: SelectorType<R>) {
+export function useWebsocketStore<R>(selector: SelectorType<R>) : R {
     const store = useContext(WebSocketContext)
     if (!store) {
         throw new Error('Missing WebsocketStoreProvider')

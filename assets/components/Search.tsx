@@ -52,7 +52,7 @@ export default function Search() {
             // Add a delay so the animation doesn't end too fast.
             setTimeout(() => {
                 startTransition(() => {
-                    if (animationStore.states.animation === AnimationState.Finished) {
+                    if (animationStore.states.animation !== AnimationState.Finished) {
                         animationStore.animation.finish();
                     }
                 });
@@ -81,7 +81,7 @@ export default function Search() {
                             maxW={animationStore.states.searchBox === SearchBoxState.Focused || animationStore.states.search !== SearchState.Waiting ? '4xl' : '2xl'}>
                             <Flex direction={'column'}>
                                 <SearchBar tr={tr}/>
-                                <Result/>
+                                {animationStore.states.search === SearchState.Finished &&  <Result/>}
                             </Flex>
                         </Container>
                         <Fade

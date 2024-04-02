@@ -2,7 +2,7 @@
 
 namespace App\Architecture;
 
-enum Locations: string
+enum Category: string
 {
     case DOCUMENTATIONS = 'Documentations';
     case TUTORIALS = 'Tutorials';

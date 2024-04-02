@@ -48,17 +48,19 @@ class SuggestionMessage implements WebsocketMessageInterface
             $responseTime = microtime(true) - $start;
 
             $connection->send(
-                [
-                    'status' => 'error',
-                    'type' => self::getMessageType(),
-                    'message' => 'Something went extremely wrong. This incident has been reported!',
-                    'extra' => [
-                        'executionTime' => [
-                            'took' => number_format($responseTime, 4) . 'ms',
-                            'tookRaw' => $responseTime
-                        ],
+                json_encode(
+                    [
+                        'status' => 'error',
+                        'type' => self::getMessageType(),
+                        'message' => 'Something went extremely wrong. This incident has been reported!',
+                        'extra' => [
+                            'executionTime' => [
+                                'took' => number_format($responseTime, 4) . 'ms',
+                                'tookRaw' => $responseTime
+                            ],
+                        ]
                     ]
-                ]
+                )
             );
         }
     }

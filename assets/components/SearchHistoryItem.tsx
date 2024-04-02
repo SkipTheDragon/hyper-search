@@ -53,7 +53,7 @@ export default function SearchHistoryItem(
             fontSize={"1rem"}
             size={"lg"}
             cursor={'pointer'}
-            placeholder={historyItem.payload.term}
+            placeholder={historyItem.payload?.term}
         />
     );
 
