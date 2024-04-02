@@ -121,9 +121,15 @@ const SearchBar: React.FC<SearchBarProps> = (
         ) {
             const words = searchStore.states.search.split(' ');
             if (autocompleteQuery.data[0].normalized.startsWith(words[words.length - 1])) {
+                const autocompleteValue = autocompleteQuery.data[0].normalized.replace(words[words.length - 1], '');
+
+                if (autocompleteValue === '*') {
+                    return;
+                }
+
                 setAutocompleteText([
                     searchStore.states.search,
-                    autocompleteQuery.data[0].normalized.replace(words[words.length - 1], ''),
+                    autocompleteValue,
                 ]);
                 return;
             }
