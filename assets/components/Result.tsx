@@ -4,7 +4,7 @@ import {SearchIcon} from "@chakra-ui/icons";
 import NotFound from "./NotFound";
 import Bar from "./Bar";
 import ResultItem from "./ResultItem";
-import {AnimationState, useAnimationStore} from "../stores/animationStore";
+import {AnimationState, SearchBoxState, useAnimationStore} from "../stores/animationStore";
 import {WebsocketStoreState} from "../stores/websocketStore";
 import {useWebsocketStore} from "../context/WebSocketContextProvider";
 import {CategoryResult} from "../types/ws/results/CategoryResult";
@@ -32,8 +32,22 @@ const Result = () => {
         setCategories(websocketStore.states.mappedResults?.FETCH_CATEGORIES_QUERY?.items ?? [])
     }, [websocketStore.states.mappedResults]);
 
+    useEffect(() => {
+        if (animationStore.states.searchBox === SearchBoxState.Focused) {
+            setCurrentLocation(null)
+        }
+    }, [animationStore.states.searchBox])
+
     if (lastSearchQueryData === undefined) {
         return null;
+    }
+
+    function changeLocation(location: string) {
+        setCurrentLocation(location);
+        animationStore.searchBox.blur();
+        if (document?.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
     }
 
     return (
@@ -46,6 +60,7 @@ const Result = () => {
             >
                 <Grid templateColumns='35% 65%' gap={0}>
                     <GridItem w='100%'
+                              paddingY={'2px'}
                               display="flex"
                               flexDirection='column'
                               borderRight={'1px'}
@@ -56,9 +71,9 @@ const Result = () => {
                                 _focusVisible={{bg: bgColorHover}}
                                 boxShadow={'none'}
                                 bg={currentLocation === category.name ? bgColorHover : bgColor}
-                                onFocus={() => setCurrentLocation(category.name)}
-                                onMouseOver={() => setCurrentLocation(category.name)}
-                                onClick={() => setCurrentLocation(category.name)}
+                                onFocus={() => changeLocation(category.name)}
+                                onMouseOver={() => changeLocation(category.name)}
+                                onClick={() => changeLocation(category.name)}
                                 leftIcon={
                                     <>
                                         <Box

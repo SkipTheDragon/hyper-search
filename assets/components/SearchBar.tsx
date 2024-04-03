@@ -6,7 +6,7 @@ import {
     InputLeftElement,
     InputRightElement,
     Kbd,
-    Spinner,
+    Spinner, Tooltip,
     useColorModeValue
 } from "@chakra-ui/react";
 import {SearchIcon} from "@chakra-ui/icons";
@@ -32,6 +32,7 @@ const SearchBar: React.FC<SearchBarProps> = (
     }) => {
 
     const searchBoxRef = useRef(null)
+    const currentTextRef = useRef<HTMLElement | null>(null);
 
     function useKey(key: string, ref: MutableRefObject<HTMLInputElement | null>) {
         const listener = (e: KeyboardEvent) => hotkeyPress(key, ref, e);
@@ -47,7 +48,7 @@ const SearchBar: React.FC<SearchBarProps> = (
     const iconColors = useColorModeValue('gray.700', 'navy.100');
 
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore<WebsocketStoreState>((store : WebsocketStoreState)=> store);
+    const websocketStore = useWebsocketStore<WebsocketStoreState>((store: WebsocketStoreState) => store);
     const searchStore = useSearchStore();
 
     const isMac = navigator.userAgent.includes('Mac') // true
@@ -55,6 +56,7 @@ const SearchBar: React.FC<SearchBarProps> = (
     const returnRandomMessage = useMemo(() => randomMessage(), []);
 
     const [value] = useDebounce(searchStore.states.search, 1000);
+    const [isAutocompleteOverflowing, setAutocompleteOverflowing] = useState(false);
 
     // Get search query from window
     useEffect(() => {
@@ -117,7 +119,8 @@ const SearchBar: React.FC<SearchBarProps> = (
             searchStore.states.search.length !== 0 &&
             autocompleteQuery &&
             autocompleteQuery.data &&
-            autocompleteQuery.data.length > 0
+            autocompleteQuery.data.length > 0 &&
+            "normalized" in autocompleteQuery.data[0]
         ) {
             const words = searchStore.states.search.split(' ');
             if (autocompleteQuery.data[0].normalized.startsWith(words[words.length - 1])) {
@@ -138,6 +141,7 @@ const SearchBar: React.FC<SearchBarProps> = (
 
     }, [searchStore.states.search, autocompleteQuery]);
 
+
     // Autocomplete on meta + arrow right
     useEffect(() => {
         const listener = (e: KeyboardEvent) => {
@@ -157,6 +161,85 @@ const SearchBar: React.FC<SearchBarProps> = (
 
         return () => document.removeEventListener('keydown', listener);
     }, [autocompleteQuery, animationStore.states.searchBox, searchStore.states.search]);
+
+    useEffect(() => {
+        const localCurrentText = currentTextRef.current;
+
+        if (localCurrentText === null) {
+            return;
+        }
+
+        if (localCurrentText.offsetWidth > 600) {
+            setAutocompleteOverflowing(true);
+        } else if (localCurrentText.offsetWidth < 600) {
+            setAutocompleteOverflowing(false);
+        }
+    }, [autocompleteText])
+
+    const handleRightInputElement = () => {
+        if (animationStore.states.searchBox !== SearchBoxState.Focused) {
+            return (
+                <div>
+                    <Kbd>
+                        {
+                            isMac ? '⌘' : 'alt'
+                        }
+                    </Kbd> + <Kbd>K</Kbd>
+                </div>
+            );
+        }
+
+        if (animationStore.states.searchBox === SearchBoxState.Focused &&
+            autocompleteText.length > 0 &&
+            !isAutocompleteOverflowing &&
+            autocompleteText[autocompleteText.length - 1] !== '') {
+
+            return (
+                <div>
+                    <Kbd>
+                        {
+                            isMac ? '⌘' : 'alt'
+                        }
+                    </Kbd> +
+                    <Kbd>→</Kbd>
+                </div>
+            );
+        }
+
+        if (animationStore.states.searchBox === SearchBoxState.Focused &&
+            animationStore.states.animation === AnimationState.Finished &&
+            websocketStore.states.mappedResults.SEARCH_QUERY &&
+            (autocompleteText[autocompleteText.length - 1] === '' || autocompleteText.length === 0)) {
+
+            return (
+                <Badge
+                    colorScheme="green"
+                    variant="subtle">
+                    Took: {websocketStore.states.mappedResults?.SEARCH_QUERY?.extra.executionTime.took}
+                </Badge>
+            );
+        }
+
+        if (isAutocompleteOverflowing &&
+            autocompleteQuery &&
+            autocompleteQuery.data.length > 0 &&
+            "normalized" in autocompleteQuery.data[0]
+        ) {
+            return (
+                <Tooltip label={"Press " + (isMac ? '⌘' : 'alt') + ' and → simultaneously to autocomplete this word.'}
+                         hasArrow>
+                    <Badge
+                        cursor="pointer"
+                        colorScheme="brand"
+                        variant="subtle">
+                        {autocompleteQuery.data[0].normalized}
+                    </Badge>
+                </Tooltip>
+            );
+        }
+
+        return null;
+    }
 
     return (
         <div>
@@ -180,15 +263,24 @@ const SearchBar: React.FC<SearchBarProps> = (
 
                     {
                         searchStore.states.search.length !== 0 &&
+                        !isAutocompleteOverflowing &&
+                        animationStore.states.searchBox === SearchBoxState.Focused &&
                         autocompleteText &&
                         <chakra.div
                             position={'absolute'}
                             left={'100%'}
-                            letterSpacing={'0.15px'}
+                            letterSpacing={'0'}
                             width={'720px'}
+                            whiteSpace={'nowrap'}
                             textAlign={'left'}
+                            overflow={'hidden'}
                         >
-                            <chakra.span opacity={'0'} fontWeight={400} fontSize={'1rem'}>
+                            <chakra.span
+                                ref={currentTextRef}
+                                opacity={'0'}
+                                fontWeight={400}
+                                fontSize={'1rem'}
+                            >
                                 {autocompleteText[0]}
                             </chakra.span>
                             <chakra.span marginLeft={'0.5px'}
@@ -214,46 +306,14 @@ const SearchBar: React.FC<SearchBarProps> = (
                     id="hyper-search"
                     fontSize={"1rem"}
                     size="lg"
+                    paddingRight={animationStore.states.searchBox === SearchBoxState.Blurred ? '0' : '10rem'}
                     placeholder={returnRandomMessage}
                 />
                 {
-                    <InputRightElement pointerEvents='none'
-                                       width={animationStore.states.searchBox === SearchBoxState.Focused && animationStore.states.animation === AnimationState.Finished ? '8rem' : '5.5rem'}>
-                        {
-                            animationStore.states.searchBox !== SearchBoxState.Focused &&
-                            <div>
-                                <Kbd>
-                                    {
-                                        isMac ? '⌘' : 'alt'
-                                    }
-                                </Kbd> + <Kbd>K</Kbd>
-                            </div>
-                        }
-                        {
-                            animationStore.states.searchBox === SearchBoxState.Focused &&
-                            autocompleteText.length > 0 &&
-                            autocompleteText[autocompleteText.length - 1] !== '' &&
-                            <div>
-                                <Kbd>
-                                    {
-                                        isMac ? '⌘' : 'alt'
-                                    }
-                                </Kbd> +
-                                <Kbd>→</Kbd>
-                            </div>
-                        }
-                        {
-                            animationStore.states.searchBox === SearchBoxState.Focused &&
-                            animationStore.states.animation === AnimationState.Finished &&
-                            websocketStore.states.mappedResults.SEARCH_QUERY &&
-                            (autocompleteText[autocompleteText.length - 1] === '' || autocompleteText.length === 0) &&
-                            <Badge
-                                colorScheme="green"
-                                variant="subtle">
-                                Took: {websocketStore.states.mappedResults?.SEARCH_QUERY?.extra.executionTime.took}
-                            </Badge>
-                        }
+                    <InputRightElement paddingRight="1.2rem"
+                                       width="fit-content">
 
+                        {handleRightInputElement()}
 
                     </InputRightElement>
                 }
