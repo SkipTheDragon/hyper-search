@@ -24,6 +24,7 @@ export default function () {
     const [fullHistory, setFullHistory] = useState<Message<SearchPayload>[]>([]);
     const websocketHistory: Message<SearchPayload>[] = useWebsocketStore((store: WebsocketStoreState) => store.states.pastMessages).filter((message) => message.type === MessageTypes.SearchQuery);
     const fillHistory = useSettingsStore((store) => store.states.fillHistory);
+
     useEffect(() => {
         if (fillHistory) {
             setFullHistory(new Array(100).fill(0, 0, 100).map((e, i) => {

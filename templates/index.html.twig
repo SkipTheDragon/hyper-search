@@ -1,18 +1,11 @@
 {% extends 'base.html.twig' %}
 
-
-
 {% block body %}
-    {#    TODO: #}
-    {#    - mirror bitbucket to github https://blog.idrsolutions.com/how-to-sync-bitbucket-repo-to-github/ #}
-    {#    - reducer #}
-    {#    - compute shadow based on sun position #}
-    {#    - optimize imports #}
     <script>
         window.config = {{ config|json_encode|raw }}
     </script>
 
     <div class="base-component" {{ react_component('search', {}) }}>
-        Loading... <i class="fas fa-cog fa-spin fa-3x"></i>
+        Loading...
     </div>
 {% endblock %}

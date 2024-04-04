@@ -4,6 +4,8 @@ import {Message} from "../../types/ws/messages/Message";
 import {SearchPayload} from "../../types/ws/messages/payloads/SearchPayload";
 import {searchHistoryBoxesPerPage} from "./HistoryPane";
 import {useSettingsStore} from "../../stores/settingsStore";
+import computeTranslateBasedOnPosition from "../../functions/history/computeTranslateBasedOnPosition";
+import computeWidthBasedOnPosition from "../../functions/history/computeWidthBasedOnPosition";
 
 export default function SearchHistoryItem(
     {
@@ -26,15 +28,6 @@ export default function SearchHistoryItem(
             setWidth(sizeKey);
         }, 100 * (searchHistoryBoxesPerPage - sizeKey));
     }, [sizeKey])
-
-    const computeWidthBasedOnPosition = (key: number) => {
-        const calc = (30 + (key * 10));
-        return (calc > 100 ? 100 : calc) + '%';
-    }
-
-    const computeTranslateBasedOnPosition = (key: number, bonus: number = 0) => {
-        return '-' + (((key / 1.3) * 50) + bonus) + 'px';
-    }
 
     const input = (
         <Input
