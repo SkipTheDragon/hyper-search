@@ -47,6 +47,7 @@ export default function WebSocketContextProvider({children}: { children: ReactNo
 
             animationStore.search.reset()
             animationStore.animation.reset()
+            document.body.classList.remove('opacity')
 
             toast({
                 duration: time,

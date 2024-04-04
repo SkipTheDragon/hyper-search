@@ -1,5 +1,5 @@
 import Star from "./Star";
-import {MutableRefObject} from "react";
+import {AnimationState} from "../../../stores/animationStore";
 
 export default class StarsScene {
     private vel: number;
@@ -10,6 +10,7 @@ export default class StarsScene {
     private readonly canvas: any;
     private readonly context: any;
     private center: any;
+    private status: AnimationState = AnimationState.NotRunning;
 
     constructor(
         canvasRef : HTMLCanvasElement|null,
@@ -43,7 +44,7 @@ export default class StarsScene {
         window.addEventListener("resize", this.resize.bind(this));
     }
 
-    start() {
+    private start() {
         const _scope = this;
         const starArgs = {
             center: {x: this.center.x, y: this.center.y},
@@ -63,19 +64,29 @@ export default class StarsScene {
         }
     }
 
-    resize() {
+    private resize() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.center.x = this.canvas.width / 2;
         this.center.y = this.canvas.height / 2;
     }
 
-    animate() {
+    private animate() {
         window.requestAnimationFrame(this.animate.bind(this));
         this.render();
     }
 
-    render() {
+    startAnimation() {
+        this.status = AnimationState.Running;
+        this.animate()
+    }
+
+    stopAnimation() {
+        this.status = AnimationState.Finished;
+        // window.cancelAnimationFrame(0);
+    }
+
+    private render() {
         // this.context.fillStyle = 'rgba(1, 4, 35, 0.8)';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.context.strokeStyle = "white";
@@ -85,12 +96,15 @@ export default class StarsScene {
             if (star.isDead()) {
                 this.stars.splice(i, 1);
                 i--;
-                this.stars.push(new Star(
-                    {x: this.center.x, y: this.center.y},
-                    this.radius,
-                    this.context,
-                    this.canvas
-                ));
+                // Add a new star if the animation is still running.
+                if (this.status === AnimationState.Running) {
+                    this.stars.push(new Star(
+                        {x: this.center.x, y: this.center.y},
+                        this.radius,
+                        this.context,
+                        this.canvas
+                    ));
+                }
             }
         }
     }

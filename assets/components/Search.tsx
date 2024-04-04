@@ -1,5 +1,5 @@
 import {Container, Fade, Flex, Stack, Text,} from '@chakra-ui/react';
-import React, {startTransition, useEffect, useRef} from "react";
+import React, {startTransition, useEffect, useRef, useState} from "react";
 import SearchBar from "../components/SearchBar";
 import Result from "../components/Result";
 import Header from "../components/Header";
@@ -13,12 +13,13 @@ import {
 } from "../stores/animationStore";
 import {useSettingsStore} from "../stores/settingsStore";
 import SearchHistory from "./SearchHistory";
+import Planets from "./Planets";
 
 export default function Search() {
     const settingsStore = useSettingsStore();
     const animationStore = useAnimationStore();
-
     const canvasRef = useRef(null)
+    const [stars, setStars] = useState<StarsScene | null>(null);
     const tr = {
         transitionProperty: "var(--chakra-transition-property-common)",
         transitionDuration: "var(--chakra-transition-duration-normal)"
@@ -34,7 +35,9 @@ export default function Search() {
             return;
         }
 
-        const stars = new StarsScene(canvasRef.current);
+        if (stars === null) {
+            setStars(new StarsScene(canvasRef.current))
+        }
 
         startTransition(() => {
             // If the user is searching, animate the background.
@@ -42,7 +45,9 @@ export default function Search() {
                 animationStore.animation.start();
 
                 if (!settingsStore.states.reducedMotion) {
-                    stars.animate();
+                    setStars(new StarsScene(canvasRef.current))
+
+                    stars?.startAnimation();
                 }
             }
         });
@@ -54,6 +59,8 @@ export default function Search() {
                 startTransition(() => {
                     if (animationStore.states.animation !== AnimationState.Finished) {
                         animationStore.animation.finish();
+                        stars?.stopAnimation();
+                        document.body.classList.add('opacity')
                     }
                 });
             }, settingsStore.states.animationDelay);
@@ -63,7 +70,9 @@ export default function Search() {
 
     return (
         <>
-            <Container maxW={'5xl'}>
+            <Container
+                maxW={'5xl'}
+            >
                 <Fade
                     in={animationStore.states.searchHistory === SearchHistoryState.NotActive}
                     unmountOnExit={true}
@@ -81,7 +90,7 @@ export default function Search() {
                             maxW={animationStore.states.searchBox === SearchBoxState.Focused || animationStore.states.search !== SearchState.Waiting ? '4xl' : '2xl'}>
                             <Flex direction={'column'}>
                                 <SearchBar tr={tr}/>
-                                {animationStore.states.search === SearchState.Finished &&  <Result/>}
+                                {animationStore.states.search === SearchState.Finished && <Result/>}
                             </Flex>
                         </Container>
                         <Fade
@@ -100,14 +109,17 @@ export default function Search() {
                     animationStore.states.animation === AnimationState.NotRunning &&
                     <SearchHistory/>
                 }
+
             </Container>
+
+            {
+                animationStore.states.animation !== AnimationState.NotRunning && <Planets/>
+            }
+
             <canvas ref={canvasRef} style={{
-                transition: 'all 0.2s ease-in-out',
-                visibility: animationStore.states.animation !== AnimationState.NotRunning ? 'visible' : 'hidden',
-                opacity: animationStore.states.animation !== AnimationState.NotRunning ? '1' : '0',
-                zIndex: -1,
-                filter: "brightness(0.8)"
-            }} id="bg"/>
+                visibility: animationStore.states.animation === AnimationState.Running ? 'visible' : 'hidden',
+                opacity: animationStore.states.animation === AnimationState.Running ? '1' : '0',
+            }} id="starSceneCanvas"/>
         </>
     );
 }

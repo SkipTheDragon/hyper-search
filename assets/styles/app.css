@@ -51,11 +51,45 @@ option {
     font-weight: 500;
 }
 
-#bg {
+#starSceneCanvas {
+    transition: all 2s ease-in-out;
+    z-index: -1;
+    filter: brightness(0.8);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+}
+
+body.image_tag::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('https://images.unsplash.com/photo-1520034475321-cbe63696469a?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    filter: brightness(20%);
     z-index: -1;
+    background-size: auto 100%;
+    background-position: center;
+    opacity: 0;
+    transition: all 1s ease-in-out;
+}
+
+@keyframes animatedBackground {
+    from {
+        background-position: center center;
+    }
+    /*use negative width if you want it to flow right to left else and positive for left to right*/
+    to {
+        background-position: -10000px center;
+    }
+}
+
+body.opacity.image_tag::before {
+    opacity: 1;
+    background-size: auto 30%;
+    animation: animatedBackground 500s linear infinite;
 }

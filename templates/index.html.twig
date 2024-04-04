@@ -4,14 +4,16 @@
 
 {% block body %}
     {#    TODO: #}
-    {#    - Stop search animation https://codepen.io/robdimarzo/pen/LMOLer / https://unsplash.com/s/photos/deep-space #}
     {#    - mirror bitbucket to github https://blog.idrsolutions.com/how-to-sync-bitbucket-repo-to-github/ #}
+    {#    - reducer #}
+    {#    - reorganize components and download images #}
+    {#    - compute shadow based on sun position #}
     {#    - optimize imports #}
     <script>
         window.config = {{ config|json_encode|raw }}
     </script>
 
-    <div {{ react_component('search', {}) }}>
+    <div class="base-component" {{ react_component('search', {}) }}>
         Loading... <i class="fas fa-cog fa-spin fa-3x"></i>
     </div>
 {% endblock %}

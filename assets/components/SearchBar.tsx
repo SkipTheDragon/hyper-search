@@ -78,6 +78,7 @@ const SearchBar: React.FC<SearchBarProps> = (
             startTransition(() => {
                 animationStore.search.reset();
                 animationStore.animation.reset();
+                document.body.classList.remove('opacity')
             });
             return;
         }
