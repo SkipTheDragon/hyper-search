@@ -11,16 +11,16 @@ import {
 } from "@chakra-ui/react";
 import {SearchIcon} from "@chakra-ui/icons";
 import React, {MutableRefObject, startTransition, useContext, useEffect, useMemo, useRef, useState} from "react";
-import {AnimationState, SearchBoxState, useAnimationStore} from "../stores/animationStore";
-import hotkeyPress from "../functions/hotkeyPress";
-import randomMessage from "../functions/randomMessage";
-import {WebSocketContext, WebsocketState, WebsocketStoreState} from "../stores/websocketStore";
+import {AnimationState, SearchBoxState, useAnimationStore} from "../../stores/animationStore";
+import hotkeyPress from "../../functions/hotkeyPress";
+import randomMessage from "../../functions/randomMessage";
+import {WebSocketContext, WebsocketState, WebsocketStoreState} from "../../stores/websocketStore";
 import {useDebounce} from "use-debounce";
-import {SearchPayload} from "../types/ws/messages/payloads/SearchPayload";
-import {MessageTypes} from "../types/ws/messages/MessageTypes";
-import {useSearchStore} from "../stores/searchStore";
-import {AutocompletePayload} from "../types/ws/messages/payloads/AutocompletePayload";
-import {useWebsocketStore} from "../context/WebSocketContextProvider";
+import {SearchPayload} from "../../types/ws/messages/payloads/SearchPayload";
+import {MessageTypes} from "../../types/ws/messages/MessageTypes";
+import {useSearchStore} from "../../stores/searchStore";
+import {AutocompletePayload} from "../../types/ws/messages/payloads/AutocompletePayload";
+import {useWebsocketStore} from "../../context/WebSocketContextProvider";
 
 export interface SearchBarProps {
     tr: any;

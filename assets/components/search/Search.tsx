@@ -1,19 +1,19 @@
 import {Container, Fade, Flex, Stack, Text,} from '@chakra-ui/react';
 import React, {startTransition, useEffect, useRef, useState} from "react";
-import SearchBar from "../components/SearchBar";
-import Result from "../components/Result";
-import Header from "../components/Header";
-import StarsScene from "../functions/animations/stars/StarsScene";
+import SearchBar from "./SearchBar";
+import Result from "../result/Result";
+import Header from "../common/Header";
+import StarsScene from "../../functions/animations/stars/StarsScene";
 import {
     AnimationState,
     SearchBoxState,
     SearchHistoryState,
     SearchState,
     useAnimationStore
-} from "../stores/animationStore";
-import {useSettingsStore} from "../stores/settingsStore";
-import SearchHistory from "./SearchHistory";
-import Planets from "./Planets";
+} from "../../stores/animationStore";
+import {useSettingsStore} from "../../stores/settingsStore";
+import SearchHistory from "../history/SearchHistory";
+import Planets from "../common/Planets";
 
 export default function Search() {
     const settingsStore = useSettingsStore();

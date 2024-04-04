@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from "react";
 import WebSocketContextProvider from "../context/WebSocketContextProvider";
-import Search from "../components/Search";
-import SettingsPanel from "../components/SettingsPanel";
+import Search from "../components/search/Search";
+import SettingsPanel from "../components/settings/SettingsPanel";
 import {ChakraBaseProvider, ColorModeScript, usePrefersReducedMotion} from "@chakra-ui/react";
 import theme from "../theme/theme";
 import {useSettingsStore} from "../stores/settingsStore";

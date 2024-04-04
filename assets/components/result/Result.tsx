@@ -1,15 +1,15 @@
 import {Box, Button, Collapse, Grid, GridItem, List, Text, useColorModeValue} from "@chakra-ui/react";
 import React, {useEffect} from "react";
 import {SearchIcon} from "@chakra-ui/icons";
-import NotFound from "./NotFound";
-import Bar from "./Bar";
+import NotFound from "../search/NotFound";
+import Bar from "../common/Bar";
 import ResultItem from "./ResultItem";
-import {AnimationState, SearchBoxState, useAnimationStore} from "../stores/animationStore";
-import {WebsocketStoreState} from "../stores/websocketStore";
-import {useWebsocketStore} from "../context/WebSocketContextProvider";
-import {CategoryResult} from "../types/ws/results/CategoryResult";
-import {MessageTypes} from "../types/ws/messages/MessageTypes";
-import DynamicIcon from "./DynamicIcon";
+import {AnimationState, SearchBoxState, useAnimationStore} from "../../stores/animationStore";
+import {WebsocketStoreState} from "../../stores/websocketStore";
+import {useWebsocketStore} from "../../context/WebSocketContextProvider";
+import {CategoryResult} from "../../types/ws/results/CategoryResult";
+import {MessageTypes} from "../../types/ws/messages/MessageTypes";
+import DynamicIcon from "../common/DynamicIcon";
 
 const Result = () => {
     const borderColor = useColorModeValue('secondaryGray.200', 'gray.800');

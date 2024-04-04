@@ -1,9 +1,9 @@
 import {Heading, Text, useColorModeValue} from "@chakra-ui/react";
 import React, {useContext} from "react";
 import {chakra} from "@chakra-ui/react";
-import {AnimationState, SearchState, useAnimationStore} from "../stores/animationStore";
-import {WebSocketContext, WebsocketStoreState} from "../stores/websocketStore";
-import {useWebsocketStore} from "../context/WebSocketContextProvider";
+import {AnimationState, SearchState, useAnimationStore} from "../../stores/animationStore";
+import {WebSocketContext, WebsocketStoreState} from "../../stores/websocketStore";
+import {useWebsocketStore} from "../../context/WebSocketContextProvider";
 
 export interface HeaderProps {
     tr: any;

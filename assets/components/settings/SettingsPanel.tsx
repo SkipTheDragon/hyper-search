@@ -9,7 +9,7 @@ import {
     FormControl,
     useColorMode, usePrefersReducedMotion, Button, FormHelperText
 } from "@chakra-ui/react";
-import {useSettingsStore} from "../stores/settingsStore";
+import {useSettingsStore} from "../../stores/settingsStore";
 import {useEffect, useState} from "react";
 import {useReducedMotion} from "framer-motion";
 

@@ -1,8 +1,8 @@
-import '../styles/Planets.css';
+import '../../styles/planets.css';
 import {useEffect, useState} from "react";
-import {AnimationState, SearchState, useAnimationStore} from "../stores/animationStore";
-import {useWebsocketStore} from "../context/WebSocketContextProvider";
-import {WebsocketStoreState} from "../stores/websocketStore";
+import {AnimationState, SearchState, useAnimationStore} from "../../stores/animationStore";
+import {useWebsocketStore} from "../../context/WebSocketContextProvider";
+import {WebsocketStoreState} from "../../stores/websocketStore";
 
 interface Planet {
     planetName: string,

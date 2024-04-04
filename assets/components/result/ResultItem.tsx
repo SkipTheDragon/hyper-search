@@ -2,7 +2,7 @@ import React from "react";
 import {Button, GridItem, Heading, Icon, ListItem, Text, useColorModeValue} from "@chakra-ui/react";
 import {FaArrowRight} from "react-icons/fa6";
 import {chakra} from "@chakra-ui/react";
-import {SearchResultItem} from "../types/ws/results/SearchResultItem";
+import {SearchResultItem} from "../../types/ws/results/SearchResultItem";
 
 const Result: React.FC<SearchResultItem['_source']> = (
     {

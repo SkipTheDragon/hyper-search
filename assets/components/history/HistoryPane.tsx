@@ -1,12 +1,12 @@
 import {chakra, Stack} from "@chakra-ui/react";
 import React, {useEffect, useRef, useState} from "react";
 import SearchHistoryItem from "./SearchHistoryItem";
-import {Message} from "../types/ws/messages/Message";
-import {SearchPayload} from "../types/ws/messages/payloads/SearchPayload";
-import {useWebsocketStore} from "../context/WebSocketContextProvider";
-import {WebsocketStoreState} from "../stores/websocketStore";
-import {MessageTypes} from "../types/ws/messages/MessageTypes";
-import {useSettingsStore} from "../stores/settingsStore";
+import {Message} from "../../types/ws/messages/Message";
+import {SearchPayload} from "../../types/ws/messages/payloads/SearchPayload";
+import {useWebsocketStore} from "../../context/WebSocketContextProvider";
+import {WebsocketStoreState} from "../../stores/websocketStore";
+import {MessageTypes} from "../../types/ws/messages/MessageTypes";
+import {useSettingsStore} from "../../stores/settingsStore";
 
 function checkScrollDirectionIsUp(event: WheelEvent) {
     if (event.deltaY) {

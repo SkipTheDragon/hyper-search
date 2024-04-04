@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {Input, SlideFade, useColorModeValue} from "@chakra-ui/react";
-import {Message} from "../types/ws/messages/Message";
-import {SearchPayload} from "../types/ws/messages/payloads/SearchPayload";
+import {Message} from "../../types/ws/messages/Message";
+import {SearchPayload} from "../../types/ws/messages/payloads/SearchPayload";
 import {searchHistoryBoxesPerPage} from "./HistoryPane";
-import {useSettingsStore} from "../stores/settingsStore";
+import {useSettingsStore} from "../../stores/settingsStore";
 
 export default function SearchHistoryItem(
     {
