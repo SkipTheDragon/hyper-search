@@ -1,10 +1,12 @@
 import '../../styles/planets.css';
 import {useEffect, useState} from "react";
-import {AnimationState, SearchState, useAnimationStore} from "../../stores/animationStore";
+import {useAnimationStore} from "../../stores/animationStore";
 import {useWebsocketStore} from "../../context/WebSocketContextProvider";
 import {WebsocketStoreState} from "../../stores/websocketStore";
 import choosePlanets from "../../functions/animations/planets/choosePlanets";
 import animationCssState from "../../functions/animations/planets/animationCssState";
+import computeShadow from "../../functions/animations/planets/computeShadow";
+import {MessageTypes} from "../../types/ws/messages/MessageTypes";
 
 export interface Planet {
     planetName: string,
@@ -13,7 +15,6 @@ export interface Planet {
 }
 
 export const planetsToRender = 3;
-
 
 export default function () {
     const [chosenPlanets, setChosenPlanets] = useState<Planet[]>([]);
@@ -25,13 +26,23 @@ export default function () {
         setChosenPlanets(choosePlanets());
     }, [])
 
+    useEffect(() => {
+        chosenPlanets.forEach((planet) => {
+            if (planet.planetName === 'sun') return;
+            computeShadow(planet.planetName + '-atmosphere', 'sun-planet');
+        })
+    }, [chosenPlanets])
+
     // How many planets to render.
 
     useEffect(() => {
         if (websocketStore.states.pastResults.length > 3) {
-            setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 setFirstSearch(false);
+                setChosenPlanets(choosePlanets());
             }, 2000)
+
+            return () => clearTimeout(timeoutId);
         }
     }, [websocketStore.states.pastResults]);
 
@@ -42,27 +53,27 @@ export default function () {
             left: 0,
             right: 0,
             bottom: 0,
-            visibility: firstSearch ?  'hidden' : 'visible',
+            visibility: firstSearch ? 'hidden' : 'visible',
             zIndex: -1,
             animation: animationCssState(firstSearch, animationStore.states.animation),
         }}>
             {
                 chosenPlanets.map((planet, index) => {
                     return (
-                        <div key={index} style={{
-                        }}>
-                            <div className={"card card--" + planet.planetName} style={{
-                                transform: "translate(" + planet.location.x + "px, " + planet.location.y + "px)",
-                                width: planet.size + 'px',
-                                height: planet.size + 'px',
-                            }}>
-                                <div className="card__planet">
-                                    <div className="planet__atmosphere" style={{
-                                        width: planet.size + 'px',
-                                        height: planet.size + 'px',
-                                    }}>
-                                        <div className="planet__surface"></div>
-                                    </div>
+                        <div className={"card card--" + planet.planetName}
+                             key={index}
+                             id={planet.planetName + '-planet'}
+                             style={{
+                                 transform: "translate(" + planet.location.x + "px, " + planet.location.y + "px)",
+                                 width: planet.size + 'px',
+                                 height: planet.size + 'px',
+                             }}>
+                            <div className="card__planet">
+                                <div className="planet__atmosphere" id={planet.planetName + '-atmosphere'} style={{
+                                    width: planet.size + 'px',
+                                    height: planet.size + 'px',
+                                }}>
+                                    <div className="planet__surface"></div>
                                 </div>
                             </div>
                         </div>

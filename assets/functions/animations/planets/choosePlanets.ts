@@ -21,7 +21,7 @@ export default function choosePlanets() {
     chosenPlanets.push({
         planetName: 'sun',
         size: 600,
-        location: {x: window.document.body.clientWidth / 2, y: window.document.body.clientHeight / 2}
+        location: randomizePlanetLocation()
     })
 
     for (let i = 0; i < planetsToRender; i++) {

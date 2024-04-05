@@ -57,6 +57,7 @@ const SearchBar: React.FC<SearchBarProps> = (
 
     const [value] = useDebounce(searchStore.states.search, 1000);
     const [isAutocompleteOverflowing, setAutocompleteOverflowing] = useState(false);
+    const [realValue, setRealValue] = useState('');
 
     // Get search query from window
     useEffect(() => {
@@ -72,9 +73,9 @@ const SearchBar: React.FC<SearchBarProps> = (
 
     useKey('k', searchBoxRef);
 
-    // Request search results
+    // Reset states when search is empty
     useEffect(() => {
-        if (value.length === 0) {
+        if (realValue.length === 0) {
             startTransition(() => {
                 animationStore.search.reset();
                 animationStore.animation.reset();
@@ -82,6 +83,11 @@ const SearchBar: React.FC<SearchBarProps> = (
             });
             return;
         }
+    }, [realValue]);
+
+    // Request search results
+    useEffect(() => {
+        if (value === '' || value === ' ') return;
 
         websocketStore.actions.sendMessage<SearchPayload>({
             type: MessageTypes.SearchQuery,
@@ -93,8 +99,7 @@ const SearchBar: React.FC<SearchBarProps> = (
         startTransition(() => {
             animationStore.search.start();
         });
-
-    }, [value]);
+    }, [value])
 
     const [autocompleteText, setAutocompleteText] = useState<string[]>([]);
 
@@ -296,7 +301,11 @@ const SearchBar: React.FC<SearchBarProps> = (
                 <Input
                     onBlur={() => animationStore.searchBox.blur()}
                     onFocus={() => animationStore.searchBox.focus()}
-                    onChange={(e) => searchStore.actions.search(e.target.value)}
+                    onChange={(e) => {
+                        const val = e.target.value;
+                        setRealValue(val);
+                        searchStore.actions.search(val)
+                    }}
                     value={searchStore.states.search}
                     color={searchTextColor}
                     borderBottomRadius={animationStore.states.animation === AnimationState.Finished ? '0' : 'md'}

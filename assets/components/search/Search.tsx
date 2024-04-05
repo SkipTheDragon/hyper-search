@@ -53,17 +53,19 @@ export default function Search() {
         });
 
         // If the search stopped, stop the animation.
-        if (animationStore.states.search === SearchState.Finished) {
+        if (animationStore.states.search === SearchState.Finished && animationStore.states.animation === AnimationState.Running) {
             // Add a delay so the animation doesn't end too fast.
-            setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 startTransition(() => {
-                    if (animationStore.states.animation !== AnimationState.Finished) {
+                    if (animationStore.states.animation === AnimationState.Running) {
                         animationStore.animation.finish();
                         stars?.stopAnimation();
                         document.body.classList.add('opacity')
                     }
                 });
             }, settingsStore.states.animationDelay);
+
+            return () => clearTimeout(timeoutId);
         }
 
     }, [animationStore.states.search, canvasRef]);

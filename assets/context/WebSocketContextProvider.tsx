@@ -1,9 +1,10 @@
 import React, {ReactNode, useContext, useEffect, useRef, useState} from "react";
 import {createWebsocketStore, WebSocketContext, WebsocketState, WebsocketStoreState} from "../stores/websocketStore";
 import {Alert, AlertTitle, Button, useToast, chakra} from "@chakra-ui/react";
-import {useAnimationStore} from "../stores/animationStore";
+import {SearchState, useAnimationStore} from "../stores/animationStore";
 import {StoreApi, useStore} from "zustand";
 import ArgumentsOf = jest.ArgumentsOf;
+import {MessageTypes} from "../types/ws/messages/MessageTypes";
 
 
 export default function WebSocketContextProvider({children}: { children: ReactNode }) {
@@ -23,7 +24,11 @@ export default function WebSocketContextProvider({children}: { children: ReactNo
     storeRef.current.subscribe((currentStore, prevStore) => {
         setState(currentStore.states.state)
 
-        if (currentStore.states.pastResults.length !== prevStore.states.pastResults.length) {
+        if (
+            currentStore.states.pastResults.filter(r => r.type === MessageTypes.SearchQuery).length >
+            prevStore.states.pastResults.filter(r => r.type === MessageTypes.SearchQuery).length &&
+            animationStore.states.search === SearchState.Searching
+        ) {
             animationStore.search.finish()
         }
     })
