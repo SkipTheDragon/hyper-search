@@ -6,7 +6,12 @@ import useWebsocketStateAlert from "../hooks/useWebsocketStateAlert";
 
 
 export default function WebSocketContextProvider({children}: { children: ReactNode }) {
-    const storeRef = useRef(createWebsocketStore())
+    const storeRef = useRef<ReturnType<typeof createWebsocketStore>>()
+
+    if (!storeRef.current) {
+        storeRef.current = createWebsocketStore();
+    }
+
     const animationStore = useAnimationStore();
 
     // States from the store do not update in real-time, so we need to use local state to force a re-render.
