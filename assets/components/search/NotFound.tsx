@@ -1,7 +1,6 @@
-import {Badge, GridItem, Heading, Icon, Text, useColorModeValue, chakra, Spinner} from "@chakra-ui/react";
+import {Badge, chakra, GridItem, Heading, Icon, Spinner, Text, useColorModeValue} from "@chakra-ui/react";
 import {IoRadioSharp} from "react-icons/io5";
-import React, {startTransition, useContext, useEffect} from "react";
-import {WebSocketContext, WebsocketStoreState} from "../../stores/websocketStore";
+import React, {startTransition, useEffect} from "react";
 import {SuggestionPayload} from "../../types/ws/messages/payloads/SuggestionPayload";
 import {MessageTypes} from "../../types/ws/messages/MessageTypes";
 import {useSearchStore} from "../../stores/searchStore";

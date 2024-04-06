@@ -1,5 +1,5 @@
-import {chakra, Stack} from "@chakra-ui/react";
-import React, {useEffect, useRef, useState} from "react";
+import {Stack} from "@chakra-ui/react";
+import React, {useRef} from "react";
 import SearchHistoryItem from "./SearchHistoryItem";
 import useScrollAnimationHandler from "../../hooks/useScrollAnimationHandler";
 

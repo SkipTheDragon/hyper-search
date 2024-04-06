@@ -1,6 +1,6 @@
 import {WebSocketContext, WebsocketStoreState} from "../stores/websocketStore";
 import {useContext} from "react";
-import {StoreApi, useStore} from "zustand";
+import {useStore} from "zustand";
 
 function useWebsocketStore<T>(selector ?: undefined): WebsocketStoreState
 function useWebsocketStore<T>(selector ?: (state: WebsocketStoreState) => T): T

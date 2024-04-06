@@ -1,4 +1,4 @@
-import {create, createStore} from 'zustand'
+import {create} from 'zustand'
 import {subscribeWithSelector} from "zustand/middleware";
 
 export interface SearchStoreState {

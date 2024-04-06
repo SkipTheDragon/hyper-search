@@ -1,5 +1,3 @@
-import {useCallback} from "react";
-
 export default function randomMessage() {
     const messages = [
         "Searching for aliens: Is it just like finding a needle in a cosmic haystack?",

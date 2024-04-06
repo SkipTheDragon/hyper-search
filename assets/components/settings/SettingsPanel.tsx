@@ -1,17 +1,18 @@
 import {
     Box,
+    Button,
+    chakra,
+    FormControl,
     FormLabel,
     Input,
     Switch,
     Text,
+    useColorMode,
     useColorModeValue,
-    chakra,
-    FormControl,
-    useColorMode, usePrefersReducedMotion, Button, FormHelperText
+    usePrefersReducedMotion
 } from "@chakra-ui/react";
 import {useSettingsStore} from "../../stores/settingsStore";
 import {useEffect, useState} from "react";
-import {useReducedMotion} from "framer-motion";
 
 export default function () {
     const bgColor = useColorModeValue('gray.50', 'navy.700');

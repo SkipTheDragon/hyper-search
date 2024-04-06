@@ -2,9 +2,7 @@ import {useEffect, useState} from "react";
 import {AutocompletePayload} from "../types/ws/messages/payloads/AutocompletePayload";
 import {MessageTypes} from "../types/ws/messages/MessageTypes";
 import {SearchBoxState, useAnimationStore} from "../stores/animationStore";
-import isTextOverflowing from "../functions/isTextOverflowing";
 import {useSearchStore} from "../stores/searchStore";
-import {WebsocketStoreState} from "../stores/websocketStore";
 import useWebsocketStore from "./useWebsocketStore";
 
 export default function () {

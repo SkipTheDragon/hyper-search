@@ -1,7 +1,7 @@
-import {Box, Flex, GridItem, Kbd, Text, Tooltip, useColorMode, useColorModeValue} from "@chakra-ui/react";
+import {Box, Flex, Kbd, useColorMode, useColorModeValue} from "@chakra-ui/react";
 import React from "react";
 import Switcher from "./Switcher";
-import {CheckIcon, MoonIcon, SpinnerIcon, SunIcon} from "@chakra-ui/icons";
+import {MoonIcon, SunIcon} from "@chakra-ui/icons";
 
 export default function Bar(props: any) {
     const {colorMode, toggleColorMode} = useColorMode();

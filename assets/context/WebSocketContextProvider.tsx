@@ -1,7 +1,6 @@
-import React, {ReactNode, useContext, useEffect, useRef, useState} from "react";
-import {createWebsocketStore, WebSocketContext, WebsocketState, WebsocketStoreState} from "../stores/websocketStore";
+import React, {ReactNode, useRef, useState} from "react";
+import {createWebsocketStore, WebSocketContext, WebsocketStoreState} from "../stores/websocketStore";
 import {SearchState, useAnimationStore} from "../stores/animationStore";
-import {StoreApi, useStore} from "zustand";
 import {MessageTypes} from "../types/ws/messages/MessageTypes";
 import useWebsocketStateAlert from "../hooks/useWebsocketStateAlert";
 

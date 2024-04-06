@@ -1,6 +1,5 @@
-import {Box, FormLabel, Icon, Input, useColorMode, useColorModeValue} from "@chakra-ui/react";
-import React, {useState} from "react";
-import {MoonIcon, SunIcon} from "@chakra-ui/icons";
+import {Box, FormLabel, Input, useColorModeValue} from "@chakra-ui/react";
+import React from "react";
 
 interface SwitcherProps {
     icons: { left: JSX.Element, right: JSX.Element },

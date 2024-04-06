@@ -1,11 +1,9 @@
 import '../../styles/planets.css';
 import {useEffect, useState} from "react";
 import {useAnimationStore} from "../../stores/animationStore";
-import {WebsocketStoreState} from "../../stores/websocketStore";
 import choosePlanets from "../../functions/animations/planets/choosePlanets";
 import animationCssState from "../../functions/animations/planets/animationCssState";
 import computeShadow from "../../functions/animations/planets/computeShadow";
-import {MessageTypes} from "../../types/ws/messages/MessageTypes";
 import useWebsocketStore from "../../hooks/useWebsocketStore";
 
 export interface Planet {

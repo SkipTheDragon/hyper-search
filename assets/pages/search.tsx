@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect} from "react";
 import WebSocketContextProvider from "../context/WebSocketContextProvider";
 import Search from "../components/search/Search";
 import SettingsPanel from "../components/settings/SettingsPanel";

@@ -1,8 +1,7 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {Message} from "../types/ws/messages/Message";
 import {SearchPayload} from "../types/ws/messages/payloads/SearchPayload";
 import {searchHistoryBoxesPerPage} from "../components/history/HistoryPane";
-import {WebsocketStoreState} from "../stores/websocketStore";
 import {MessageTypes} from "../types/ws/messages/MessageTypes";
 import {useSettingsStore} from "../stores/settingsStore";
 import checkScrollDirectionIsUp from "../functions/checkScrollDirectionIsUp";

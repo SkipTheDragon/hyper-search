@@ -1,5 +1,5 @@
 import mapWsStateToStoreState from "./mapWsStateToStoreState";
-import {WebsocketState, WebsocketStoreState} from "../stores/websocketStore";
+import {WebsocketStoreState} from "../stores/websocketStore";
 import {createStore} from "zustand";
 
 /**

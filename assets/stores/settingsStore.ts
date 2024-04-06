@@ -1,8 +1,5 @@
-import {create, createStore} from 'zustand'
+import {create} from 'zustand'
 import {subscribeWithSelector} from "zustand/middleware";
-import {usePrefersReducedMotion} from "@chakra-ui/react";
-import {createContext} from "react";
-import {createWebsocketStore} from "./websocketStore";
 
 export interface SettingsStoreState {
     states: {

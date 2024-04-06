@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, {memo} from "react";
+import React from "react";
 import ioIcons from "react-icons/io5/index";
 
 function DynamicIcon({nameIcon}: {     nameIcon: string; }) {
