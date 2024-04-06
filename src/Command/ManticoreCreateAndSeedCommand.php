@@ -32,9 +32,13 @@ class ManticoreCreateAndSeedCommand extends Command
         $config = ['host' => $manticoreConfig['host'], 'port' => $manticoreConfig['port']];
         $client = new Client($config);
 
-        $index = $client->index('links');
+        try {
+            $index = $client->index('links');
 
-        $index->drop();
+            $index->drop();
+        } catch (\Exception $exception) {
+            // Ignore if the index does not exist
+        }
 
         $index->create(
             [
