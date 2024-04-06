@@ -14,5 +14,5 @@ pipelines:
           enabled: false
         script:
           - git clone --bare git@bitbucket.org:wyverr/hyper-search.git
-          - cd RepoName.git
+          - cd hyper-search.git
           - git push --mirror git@github.com:SkipTheDragon/hyper-search.git
