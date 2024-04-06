@@ -1,6 +1,7 @@
 import {MessageTypes} from "../messages/MessageTypes";
 
 export interface BasicResult {
+    id?: number,
     status: "success" | "error",
     type: MessageTypes,
     message?: string,

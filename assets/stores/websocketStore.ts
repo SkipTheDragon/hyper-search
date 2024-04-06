@@ -86,10 +86,13 @@ export const createWebsocketStore = () => {
                                         ...store.states.mappedMessages,
                                         [message.type]: message.payload
                                     },
-                                    pastMessages: [...store.states.pastMessages, {
-                                        id: store.states.pastMessages.length,
-                                        ...message
-                                    }],
+                                    pastMessages: [
+                                        ...store.states.pastMessages,
+                                        {
+                                            id: store.states.pastMessages.length === 0 ? 1 : store.states.pastMessages[store.states.pastMessages.length - 1].id + 1,
+                                            ...message
+                                        }
+                                    ],
                                 }
                             };
                         }),
@@ -106,10 +109,13 @@ export const createWebsocketStore = () => {
                                             ...store.states.mappedResults,
                                             [result.type]: result
                                         },
-                                        pastResults: [...store.states.pastResults, {
-                                            id: store.states.pastResults.length,
-                                            ...result
-                                        }],
+                                        pastResults: [
+                                            ...store.states.pastResults,
+                                            {
+                                                id: store.states.pastResults.length === 0 ? 1 : store.states.pastResults[store.states.pastResults.length - 1].id + 1,
+                                                ...result
+                                            }
+                                        ],
                                     }
                                 }
                             )),
@@ -154,4 +160,4 @@ export const createWebsocketStore = () => {
 }
 
 
-export const WebSocketContext = createContext<ReturnType<typeof createWebsocketStore>|null>(null)
+export const WebSocketContext = createContext<ReturnType<typeof createWebsocketStore> | null>(null)
