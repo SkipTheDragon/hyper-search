@@ -5,7 +5,6 @@ import NotFound from "../search/NotFound";
 import Bar from "../common/Bar";
 import ResultItem from "./ResultItem";
 import {AnimationState, SearchBoxState, useAnimationStore} from "../../stores/animationStore";
-import {WebsocketStoreState} from "../../stores/websocketStore";
 import {CategoryResult} from "../../types/ws/results/CategoryResult";
 import {MessageTypes} from "../../types/ws/messages/MessageTypes";
 import DynamicIcon from "../common/DynamicIcon";
@@ -18,7 +17,7 @@ const Result = () => {
     const [currentLocation, setCurrentLocation] = React.useState<string | null>(null);
     const [categories, setCategories] = React.useState<CategoryResult['items']>([]);
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore((store : WebsocketStoreState ) => store);
+    const websocketStore = useWebsocketStore();
 
     const lastSearchQueryData = websocketStore.states.mappedResults?.SEARCH_QUERY?.data;
 
