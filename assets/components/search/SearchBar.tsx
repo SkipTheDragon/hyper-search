@@ -20,7 +20,13 @@ import {SearchPayload} from "../../types/ws/messages/payloads/SearchPayload";
 import {MessageTypes} from "../../types/ws/messages/MessageTypes";
 import {useSearchStore} from "../../stores/searchStore";
 import {AutocompletePayload} from "../../types/ws/messages/payloads/AutocompletePayload";
-import {useWebsocketStore} from "../../context/WebSocketContextProvider";
+import useAnimationReset from "../../hooks/useAnimationReset";
+import SearchBoxInputRightElement from "./SearchBoxInputRightElement";
+import useKey from "../../hooks/useKey";
+import isTextOverflowing from "../../functions/isTextOverflowing";
+import useAutocomplete from "../../hooks/useAutocomplete";
+import useWebsocketStore from "../../hooks/useWebsocketStore";
+import {AutocompleteResult} from "../../types/ws/results/AutocompleteResult";
 
 export interface SearchBarProps {
     tr: any;
@@ -33,31 +39,25 @@ const SearchBar: React.FC<SearchBarProps> = (
 
     const searchBoxRef = useRef(null)
     const currentTextRef = useRef<HTMLElement | null>(null);
-
-    function useKey(key: string, ref: MutableRefObject<HTMLInputElement | null>) {
-        const listener = (e: KeyboardEvent) => hotkeyPress(key, ref, e);
-        useEffect(() => {
-            document.addEventListener('keydown', listener);
-            return () => document.removeEventListener('keydown', listener);
-        }, [key]);
-    }
-
+    const {resetAnimations} = useAnimationReset();
+    const {autocompleteText} = useAutocomplete();
+    useKey('k', searchBoxRef);
 
     const searchBg = useColorModeValue('gray.50', 'navy.700');
     const searchTextColor = useColorModeValue('gray.700', 'white');
     const iconColors = useColorModeValue('gray.700', 'navy.100');
 
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore<WebsocketStoreState>((store: WebsocketStoreState) => store);
+    const websocketStore = useWebsocketStore();
     const searchStore = useSearchStore();
-
-    const isMac = navigator.userAgent.includes('Mac') // true
 
     const returnRandomMessage = useMemo(() => randomMessage(), []);
 
     const [value] = useDebounce(searchStore.states.search, 1000);
-    const [isAutocompleteOverflowing, setAutocompleteOverflowing] = useState(false);
     const [realValue, setRealValue] = useState('');
+
+    const autocompleteQuery : AutocompleteResult|undefined = websocketStore.states.mappedResults.AUTOCOMPLETE_QUERY;
+    const [isAutocompleteOverflowing, setAutocompleteOverflowing] = useState(false);
 
     // Get search query from window
     useEffect(() => {
@@ -71,15 +71,12 @@ const SearchBar: React.FC<SearchBarProps> = (
         }
     }, [websocketStore.states.state]);
 
-    useKey('k', searchBoxRef);
 
     // Reset states when search is empty
     useEffect(() => {
         if (realValue.length === 0) {
             startTransition(() => {
-                animationStore.search.reset();
-                animationStore.animation.reset();
-                document.body.classList.remove('opacity')
+                resetAnimations();
             });
             return;
         }
@@ -101,151 +98,9 @@ const SearchBar: React.FC<SearchBarProps> = (
         });
     }, [value])
 
-    const [autocompleteText, setAutocompleteText] = useState<string[]>([]);
-
-    const autocompleteQuery = websocketStore.states.mappedResults.AUTOCOMPLETE_QUERY;
-
-    // Request autocomplete results
     useEffect(() => {
-        if (searchStore.states.search.length >= 1) {
-            const words = searchStore.states.search.split(' ');
-
-            websocketStore.actions.sendMessage<AutocompletePayload>({
-                type: MessageTypes.AutocompleteQuery,
-                payload: {
-                    term: words[words.length - 1]
-                }
-            });
-        }
-    }, [searchStore.states.search]);
-
-    // Set autocomplete text
-    useEffect(() => {
-        if (
-            searchStore.states.search.length !== 0 &&
-            autocompleteQuery &&
-            autocompleteQuery.data &&
-            autocompleteQuery.data.length > 0 &&
-            "normalized" in autocompleteQuery.data[0]
-        ) {
-            const words = searchStore.states.search.split(' ');
-            if (autocompleteQuery.data[0].normalized.startsWith(words[words.length - 1])) {
-                const autocompleteValue = autocompleteQuery.data[0].normalized.replace(words[words.length - 1], '');
-
-                if (autocompleteValue === '*') {
-                    return;
-                }
-
-                setAutocompleteText([
-                    searchStore.states.search,
-                    autocompleteValue,
-                ]);
-                return;
-            }
-        }
-        setAutocompleteText([]);
-
-    }, [searchStore.states.search, autocompleteQuery]);
-
-
-    // Autocomplete on meta + arrow right
-    useEffect(() => {
-        const listener = (e: KeyboardEvent) => {
-            if (e.key === 'ArrowRight' &&
-                e.metaKey &&
-                animationStore.states.searchBox === SearchBoxState.Focused &&
-                autocompleteQuery &&
-                autocompleteQuery.data[0].normalized
-            ) {
-                const words = searchStore.states.search.split(' ');
-                words[words.length - 1] = autocompleteQuery.data[0].normalized;
-                searchStore.actions.search(words.join(' '));
-            }
-        };
-
-        document.addEventListener('keydown', listener);
-
-        return () => document.removeEventListener('keydown', listener);
-    }, [autocompleteQuery, animationStore.states.searchBox, searchStore.states.search]);
-
-    useEffect(() => {
-        const localCurrentText = currentTextRef.current;
-
-        if (localCurrentText === null) {
-            return;
-        }
-
-        if (localCurrentText.offsetWidth > 600) {
-            setAutocompleteOverflowing(true);
-        } else if (localCurrentText.offsetWidth < 600) {
-            setAutocompleteOverflowing(false);
-        }
+        setAutocompleteOverflowing(isTextOverflowing(currentTextRef.current, 600));
     }, [autocompleteText])
-
-    const handleRightInputElement = () => {
-        if (animationStore.states.searchBox !== SearchBoxState.Focused) {
-            return (
-                <div>
-                    <Kbd>
-                        {
-                            isMac ? '⌘' : 'alt'
-                        }
-                    </Kbd> + <Kbd>K</Kbd>
-                </div>
-            );
-        }
-
-        if (animationStore.states.searchBox === SearchBoxState.Focused &&
-            autocompleteText.length > 0 &&
-            !isAutocompleteOverflowing &&
-            autocompleteText[autocompleteText.length - 1] !== '') {
-
-            return (
-                <div>
-                    <Kbd>
-                        {
-                            isMac ? '⌘' : 'alt'
-                        }
-                    </Kbd> +
-                    <Kbd>→</Kbd>
-                </div>
-            );
-        }
-
-        if (animationStore.states.searchBox === SearchBoxState.Focused &&
-            animationStore.states.animation === AnimationState.Finished &&
-            websocketStore.states.mappedResults.SEARCH_QUERY &&
-            (autocompleteText[autocompleteText.length - 1] === '' || autocompleteText.length === 0)) {
-
-            return (
-                <Badge
-                    colorScheme="green"
-                    variant="subtle">
-                    Took: {websocketStore.states.mappedResults?.SEARCH_QUERY?.extra.executionTime.took}
-                </Badge>
-            );
-        }
-
-        if (isAutocompleteOverflowing &&
-            autocompleteQuery &&
-            autocompleteQuery.data.length > 0 &&
-            "normalized" in autocompleteQuery.data[0]
-        ) {
-            return (
-                <Tooltip label={"Press " + (isMac ? '⌘' : 'alt') + ' and → simultaneously to autocomplete this word.'}
-                         hasArrow>
-                    <Badge
-                        cursor="pointer"
-                        colorScheme="brand"
-                        variant="subtle">
-                        {autocompleteQuery.data[0].normalized}
-                    </Badge>
-                </Tooltip>
-            );
-        }
-
-        return null;
-    }
 
     return (
         <div>
@@ -322,9 +177,11 @@ const SearchBar: React.FC<SearchBarProps> = (
                 {
                     <InputRightElement paddingRight="1.2rem"
                                        width="fit-content">
-
-                        {handleRightInputElement()}
-
+                        <SearchBoxInputRightElement
+                            isAutocompleteOverflowing={isAutocompleteOverflowing}
+                            autocompleteText={autocompleteText}
+                            autocompleteQuery={autocompleteQuery}
+                        />
                     </InputRightElement>
                 }
             </InputGroup>

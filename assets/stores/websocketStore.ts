@@ -154,5 +154,4 @@ export const createWebsocketStore = () => {
 }
 
 
-// @ts-ignore - This is a hack to get the store to work with the context.
-export const WebSocketContext = createContext<ReturnType<typeof createWebsocketStore>>(createWebsocketStore)
+export const WebSocketContext = createContext<ReturnType<typeof createWebsocketStore>|null>(null)

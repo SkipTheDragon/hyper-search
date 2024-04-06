@@ -1,12 +1,12 @@
 import '../../styles/planets.css';
 import {useEffect, useState} from "react";
 import {useAnimationStore} from "../../stores/animationStore";
-import {useWebsocketStore} from "../../context/WebSocketContextProvider";
 import {WebsocketStoreState} from "../../stores/websocketStore";
 import choosePlanets from "../../functions/animations/planets/choosePlanets";
 import animationCssState from "../../functions/animations/planets/animationCssState";
 import computeShadow from "../../functions/animations/planets/computeShadow";
 import {MessageTypes} from "../../types/ws/messages/MessageTypes";
+import useWebsocketStore from "../../hooks/useWebsocketStore";
 
 export interface Planet {
     planetName: string,
@@ -20,12 +20,14 @@ export default function () {
     const [chosenPlanets, setChosenPlanets] = useState<Planet[]>([]);
     const [firstSearch, setFirstSearch] = useState<boolean>(true);
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore<WebsocketStoreState>((store) => store);
+    const websocketStore = useWebsocketStore();
 
+    // Choose the planets to render
     useEffect(() => {
         setChosenPlanets(choosePlanets());
     }, [])
 
+    // Compute the shadow of the planets
     useEffect(() => {
         chosenPlanets.forEach((planet) => {
             if (planet.planetName === 'sun') return;
@@ -33,8 +35,7 @@ export default function () {
         })
     }, [chosenPlanets])
 
-    // How many planets to render.
-
+    // Handles the animation of the planets and refreshes the planets after a search.
     useEffect(() => {
         if (websocketStore.states.pastResults.length > 3) {
             const timeoutId = setTimeout(() => {

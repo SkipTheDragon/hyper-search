@@ -3,7 +3,7 @@ import React, {useContext} from "react";
 import {chakra} from "@chakra-ui/react";
 import {AnimationState, SearchState, useAnimationStore} from "../../stores/animationStore";
 import {WebSocketContext, WebsocketStoreState} from "../../stores/websocketStore";
-import {useWebsocketStore} from "../../context/WebSocketContextProvider";
+import useWebsocketStore from "../../hooks/useWebsocketStore";
 
 export interface HeaderProps {
     tr: any;
@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = (
     }
 ) => {
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore<WebsocketStoreState>((store: WebsocketStoreState) => store);
+    const websocketStore = useWebsocketStore();
 
     const headingColorUnfocused = useColorModeValue(
         'black',

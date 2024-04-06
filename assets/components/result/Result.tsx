@@ -6,10 +6,10 @@ import Bar from "../common/Bar";
 import ResultItem from "./ResultItem";
 import {AnimationState, SearchBoxState, useAnimationStore} from "../../stores/animationStore";
 import {WebsocketStoreState} from "../../stores/websocketStore";
-import {useWebsocketStore} from "../../context/WebSocketContextProvider";
 import {CategoryResult} from "../../types/ws/results/CategoryResult";
 import {MessageTypes} from "../../types/ws/messages/MessageTypes";
 import DynamicIcon from "../common/DynamicIcon";
+import useWebsocketStore from "../../hooks/useWebsocketStore";
 
 const Result = () => {
     const borderColor = useColorModeValue('secondaryGray.200', 'gray.800');
@@ -18,7 +18,7 @@ const Result = () => {
     const [currentLocation, setCurrentLocation] = React.useState<string | null>(null);
     const [categories, setCategories] = React.useState<CategoryResult['items']>([]);
     const animationStore = useAnimationStore();
-    const websocketStore = useWebsocketStore<WebsocketStoreState>((store : WebsocketStoreState ) => store);
+    const websocketStore = useWebsocketStore((store : WebsocketStoreState ) => store);
 
     const lastSearchQueryData = websocketStore.states.mappedResults?.SEARCH_QUERY?.data;
 

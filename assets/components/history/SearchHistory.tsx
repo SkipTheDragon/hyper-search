@@ -4,10 +4,10 @@ import {AnimationState, SearchHistoryState, useAnimationStore} from "../../store
 import HistoryPane, {searchHistoryBoxesPerPage} from "./HistoryPane";
 import {Message} from "../../types/ws/messages/Message";
 import {SearchPayload} from "../../types/ws/messages/payloads/SearchPayload";
-import {useWebsocketStore} from "../../context/WebSocketContextProvider";
 import {WebsocketStoreState} from "../../stores/websocketStore";
 import {MessageTypes} from "../../types/ws/messages/MessageTypes";
 import {useSettingsStore} from "../../stores/settingsStore";
+import useWebsocketStore from "../../hooks/useWebsocketStore";
 
 export default function SearchHistory() {
     const {searchHistory} = useAnimationStore();
