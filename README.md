@@ -44,6 +44,7 @@ Or just click the [link](https://projects.wyverr.com/hyper-search) to the websit
 - Cool animations
 - Reduced motion support
 - Websockets
+- Connection status messages with the option to reconnect without reloading
 
 # Mentions
 
