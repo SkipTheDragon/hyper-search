@@ -1,6 +1,7 @@
 import randomizePlanetSize from "./randomizePlanetSize";
 import randomizePlanetLocation from "./randomizePlanetLocation";
 import {Planet, planetsToRender} from "../../../components/common/Planets";
+import randomPosition from "./randomPosition";
 
 export default function choosePlanets() {
 
@@ -21,16 +22,18 @@ export default function choosePlanets() {
     chosenPlanets.push({
         planetName: 'sun',
         size: 600,
-        location: randomizePlanetLocation()
+        location: randomPosition(600)
     })
 
     for (let i = 0; i < planetsToRender; i++) {
         const planet = planets[Math.floor(Math.random() * planets.length)];
         if (!chosenPlanets.some(p => p.planetName === planet)) {
+            const size= randomizePlanetSize();
+            const location= randomizePlanetLocation(size, chosenPlanets);
             chosenPlanets.push({
                 planetName: planet,
-                size: randomizePlanetSize(),
-                location: randomizePlanetLocation()
+                size,
+                location
             });
         } else {
             i--;
