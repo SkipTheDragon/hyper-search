@@ -89,7 +89,7 @@ export const createWebsocketStore = () => {
                                     pastMessages: [
                                         ...store.states.pastMessages,
                                         {
-                                            id: store.states.pastMessages.length === 0 ? 1 : store.states.pastMessages[store.states.pastMessages.length - 1].id + 1,
+                                            id: store.states.pastMessages.length === 0 ? 1 : (store.states.pastMessages[store.states.pastMessages.length - 1].id ?? store.states.pastMessages.length) + 1,
                                             ...message
                                         }
                                     ],
@@ -112,7 +112,7 @@ export const createWebsocketStore = () => {
                                         pastResults: [
                                             ...store.states.pastResults,
                                             {
-                                                id: store.states.pastResults.length === 0 ? 1 : store.states.pastResults[store.states.pastResults.length - 1].id + 1,
+                                                id: store.states.pastResults.length === 0 ? 1 : (store.states.pastResults[store.states.pastResults.length - 1].id ?? store.states.pastResults.length) + 1,
                                                 ...result
                                             }
                                         ],
