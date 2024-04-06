@@ -38,7 +38,6 @@ export interface WebsocketStoreState {
     }
 }
 
-const indexedDb = window.indexedDB.open("HyperSearchDB", 3);
 /**
  * Store for the websocket connection.
  */
