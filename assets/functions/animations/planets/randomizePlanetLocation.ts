@@ -1,13 +1,13 @@
 import randomPosition from "./randomPosition";
 import isTooClose from "./isTooClose";
-import {Planet, planetsToRender} from "../../../components/common/Planets";
+import {Planet} from "../../../components/common/Planets";
 
 export default function randomizePlanetLocation(size: number, planets : Planet[]) {
     let position = randomPosition(size);
     let attempts = 0;
     while (attempts < 100) {
         let tooClose = false;
-        for (let i = 0; i < planetsToRender; i++) {
+        for (let i = 0; i < planets.length; i++) {
             if (isTooClose(
                 {
                     x: position.x,

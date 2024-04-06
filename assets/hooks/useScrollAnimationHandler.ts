@@ -76,8 +76,14 @@ export default function (element: HTMLDivElement | null) {
 
     useEffect(() => {
         const start = fullHistory.length - searchHistoryBoxesPerPage;
+
         // Get the last 6 items from the history
-        setVisibleHistory(fullHistory.slice(start, fullHistory.length));
+        if (fullHistory.length > searchHistoryBoxesPerPage) {
+            setVisibleHistory(fullHistory.slice(start, fullHistory.length));
+        } else {
+            setVisibleHistory(fullHistory);
+        }
+
         setLastArrayElementKey(fullHistory.length);
     }, [fullHistory]);
 
