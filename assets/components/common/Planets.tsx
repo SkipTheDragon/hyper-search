@@ -31,7 +31,7 @@ export default function () {
     useEffect(() => {
         chosenPlanets.forEach((planet) => {
             if (planet.planetName === 'sun') return;
-            computeShadow(planet.planetName + '-atmosphere', 'sun-planet');
+            computeShadow(planet.planetName + '-atmosphere', 'sun-planet', planet.planetName );
         })
     }, [chosenPlanets])
 
