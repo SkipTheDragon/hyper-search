@@ -5,7 +5,7 @@
   ],
   "packageRules": [
     {
-      "excludePackageNames": ["@symfony/ux-react", "@symfony/ux-translator"]
+      "excludePackageNames": ["@symfony/ux-react", "@symfony/ux-translator", ""]
     }
   ]
 }
