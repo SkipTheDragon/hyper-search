@@ -1,0 +1,5 @@
+include:
+    - project: 'wyverr/renovate-runner'
+      file: '/templates/renovate.gitlab-ci.yml'
+renovate:
+    image: ghcr.io/renovatebot/renovate:full
