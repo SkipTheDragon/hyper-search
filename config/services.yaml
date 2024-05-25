@@ -5,11 +5,11 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     manticore:
-        host: manticore.hypersearch.internal
-        port: 9308
+        host: '%env(MANTICORE_HOST)%'
+        port: '%env(MANTICORE_PORT)%'
     app:
-        host: hyper-search.lndo.site
-        websocket: "ws://ws.lndo.site"
+        host: '%env(APP_HOST)%'
+        websocket: '%env(APP_WEBSOCKET_URL)%'
 
 services:
     # default configuration for services in *this* file
