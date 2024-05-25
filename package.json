@@ -8,7 +8,7 @@
         "@symfony/ux-react": "file:vendor/symfony/ux-react/assets",
         "@symfony/ux-translator": "file:vendor/symfony/ux-translator/assets",
         "@symfony/webpack-encore": "^4.0.0",
-        "@testing-library/dom": "^9.3.1",
+        "@testing-library/dom": "^10.0.0",
         "@types/jest": "^27.5.2",
         "@types/react": "^18.2.13",
         "@types/react-dom": "^18.2.6",
